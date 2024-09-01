@@ -1,10 +1,10 @@
-import 'package:firedart/firestore/firestore.dart';
+import 'package:dio/dio.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/cubit/cubit.dart';
+import 'package:illa_logs_app/firebase_options.dart';
 import 'package:illa_logs_app/layout/user_layout.dart';
 import 'package:illa_logs_app/shared/bloc_observer.dart';
-import 'package:illa_logs_app/shared/network/remote.dart';
 
 
 const apiKey = "AIzaSyDAoeiLHWK37bXUZ6rq-T33x7Aj0Oke23o";
@@ -12,7 +12,10 @@ const projectId = "illa-logs-dummy";
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firestore.initialize(projectId);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  //Firestore.initialize(projectId);
   Bloc.observer = MyBlocObserver();
   runApp(MyApp());
 }

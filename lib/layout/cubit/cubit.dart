@@ -1,4 +1,3 @@
-import 'package:firedart/firedart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:illa_logs_app/layout/cubit/states.dart';

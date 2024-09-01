@@ -43,7 +43,8 @@ dependencies:
   http: ^1.2.2
 
   #firebase
-  firedart: ^0.9.8
+  cloud_firestore: ^5.3.0
+  firebase_core: ^3.4.0
 
 
 dev_dependencies:
