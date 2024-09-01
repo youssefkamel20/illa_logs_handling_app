@@ -31,6 +31,7 @@ class UserLayout extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
+                    ///row for search fields
                     Row(
                       children: [
                         defaultFormField(titleText: 'User ID', controller: userIdController,),
@@ -41,6 +42,7 @@ class UserLayout extends StatelessWidget {
                         ),
                       ],
                     ),
+                    ///container for geoJson and logs presenting
                     const SizedBox(height: 20,),
                     Container(
                       height: 550,
@@ -50,9 +52,11 @@ class UserLayout extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
+                          ///logs presenting area
                           Expanded(
                             child: LogsScreen(),
                           ),
+                          ///geoJson area
                           Expanded(
                             child: Container(
                               color: Colors.transparent,

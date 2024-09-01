@@ -5,25 +5,17 @@ import 'package:illa_logs_app/layout/cubit/cubit.dart';
 import 'package:illa_logs_app/layout/cubit/states.dart';
 import 'package:illa_logs_app/shared/components/components.dart';
 
-class LogsScreen extends StatefulWidget {
-  @override
-  State<LogsScreen> createState() => _LogsScreenState();
-}
-
-class _LogsScreenState extends State<LogsScreen> {
-  bool isLoading = false;
-
-
-  int _page = 1;
-
-
+class LogsScreen extends StatelessWidget {
+  var sortChoice;
+  var sortPreference =[
+    'by state',
+    'by log'
+  ];
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<UserCubit, UserStates>(
-      listener: (context, state) {
-        UserCubit.get(context).scrollController.addListener(UserCubit.get(context).scrollListener);
-      },
+      listener: (context, state) {},
       builder: (context, state) {
         var cubit = UserCubit.get(context);
 
@@ -32,30 +24,67 @@ class _LogsScreenState extends State<LogsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 16.0, bottom: 10),
-                child: Text('Logs',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, bottom: 10, right: 16),
+                child: Row(
+                  children: [
+                    Text('Logs',
+                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                    ),
+                    const Spacer(),
+                    const Text(
+                      'Sort: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                      ),
+                    ),
+                    const SizedBox(width: 5,),
+                    Container(
+                      width: 90,
+                      child: DropdownButtonFormField(
+                        hint: const Text('by',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.teal,
+                          ),
+                        ),
+                        value: sortChoice,
+                        items: sortPreference.map((String items) {
+                          return DropdownMenuItem(
+                            value: items,
+                            child: Text(items),
+                          );
+                        }).toList(),
+                        onChanged: (data) {
+                          cubit.sortData(preference: data);
+                        },
+                        icon: const Icon(Icons.arrow_drop_down_circle_outlined, color: Colors.black, size: 20,),
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.teal,
+                        ),
+                        dropdownColor: Colors.black,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
-                child: ConditionalBuilder(
-                  condition: state is! UserLogsSuccessState,
-                  fallback: (context) => ListView.separated(
-                    controller: cubit.scrollController,
-                    itemBuilder: (context, index) {
-                      return defaultLogsViewer(
-                        logState: cubit.states[index],
-                        logData: cubit.logs[index],
-                        //panelController: false,
-                      );
-                    },
-                    separatorBuilder: (context, index) => const SizedBox(
-                      height: 7,
-                    ),
-                    itemCount: cubit.logslength,
+                child: ListView.separated(
+                  itemBuilder: (context, index) {
+                    return defaultLogsViewer(
+                      logState: cubit.logs[index]['state'],
+                      logData: cubit.logs[index]['log'],
+                      //panelController: false,
+                    );
+                  },
+                  separatorBuilder: (context, index) => const SizedBox(
+                    height: 7,
                   ),
-                  builder: (context) => state is UserLogsFailedState ? const Center(child: Text('Error')): const Center(child: CircularProgressIndicator()),
+                  itemCount: cubit.logs.length,
                 ),
               ),
             ],

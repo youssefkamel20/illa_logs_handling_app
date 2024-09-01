@@ -15,6 +15,10 @@ class UserLogsLoadingState extends UserStates{}
 class UserLogsSuccessState extends UserStates{}
 class UserLogsFailedState extends UserStates{}
 
+  ///Logs sorting States
+class UserLogsSortByStatesState extends UserStates{}
+class UserLogsSortByLogsState extends UserStates{}
+
   ///Logs Pagination States
 class UserLogsPaginationLoadingState extends UserStates{}
 class UserLogsPaginationSuccessState extends UserStates{}

@@ -66,11 +66,10 @@ class UserCubit extends Cubit<UserStates>{
   }*/
 
 
-  List<String> logs = [];
-  List<String> states = [];
+  List<Map<String, String>> logs = [];
   Future fetchAllDocuments() async {
     emit(UserLogsLoadingState());
-    const url = 'https://firestore.googleapis.com/v1/projects/illa-logs-dummy/databases/(default)/documents/users';
+    const url = 'https://firestore.googleapis.com/v1/projects/illa-logs-dummy/databases/(default)/documents/users?orderBy=trips';
     final response = await http.get(Uri.parse(url));
 
     ///handling response
@@ -90,11 +89,12 @@ class UserCubit extends Cubit<UserStates>{
           final log = tripFields['log']?['stringValue'];
           final state = tripFields['state']?['stringValue'];
           if (log != null && state != null) {
-            logs.add(log);
-            states.add(state);
+            logs.add({'log' : log, 'state' : state});
           }
         }
       }
+
+      //logs.sort((a, b) => a['log']!.compareTo(b['log']!));
       emit(UserLogsSuccessState());
       print(logs);
     }else {
@@ -103,9 +103,20 @@ class UserCubit extends Cubit<UserStates>{
     }
   }
 
+  var sortChoice;
+  sortData({var preference = 'by log'}) {
+    if(preference == 'by state'){
+      logs.sort((a, b) => a['state']!.compareTo(b['state']!));
+      emit(UserLogsSortByStatesState());
+    } else if(preference == 'by log'){
+      logs.sort((a, b) => a['log']!.compareTo(b['log']!));
+      emit(UserLogsSortByLogsState());
+    }
+  }
+
 
 ///scroll listener for pagination
-  int logslength = 20;
+/*  int logslength = 20;
   final ScrollController scrollController = ScrollController();
   void scrollListener(){
     if(scrollController.position.pixels == scrollController.position.maxScrollExtent) {
@@ -116,6 +127,6 @@ class UserCubit extends Cubit<UserStates>{
         return null;
       }
     }
-  }
+  }*/
 
   }
