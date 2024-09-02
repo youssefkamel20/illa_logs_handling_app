@@ -1,10 +1,8 @@
 import 'package:firedart/firestore/firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/cubit/cubit.dart';
 import 'package:illa_logs_app/layout/user_layout.dart';
 import 'package:illa_logs_app/shared/bloc_observer.dart';
-import 'package:illa_logs_app/shared/network/remote.dart';
 
 
 const apiKey = "AIzaSyDAoeiLHWK37bXUZ6rq-T33x7Aj0Oke23o";
