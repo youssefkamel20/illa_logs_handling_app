@@ -57,7 +57,7 @@ class LogsScreen extends StatelessWidget {
                           );
                         }).toList(),
                         onChanged: (data) {
-                          cubit.sortData(preference: data);
+                          //cubit.sortData(preference: data);
                         },
                         icon: const Icon(Icons.arrow_drop_down_circle_outlined, color: Colors.black, size: 20,),
                         style: const TextStyle(
@@ -76,15 +76,15 @@ class LogsScreen extends StatelessWidget {
                 child: ListView.separated(
                   itemBuilder: (context, index) {
                     return defaultLogsViewer(
-                      logState: cubit.logs[index]['state'],
-                      logData: cubit.logs[index]['log'],
+                      logState: 'E',
+                      logData: 'logs',
                       //panelController: false,
                     );
                   },
                   separatorBuilder: (context, index) => const SizedBox(
                     height: 7,
                   ),
-                  itemCount: cubit.logs.length,
+                  itemCount: 3,
                 ),
               ),
             ],

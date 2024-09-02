@@ -18,7 +18,7 @@ class UserLayout extends StatelessWidget {
 
 
     return BlocProvider(
-      create: (BuildContext context) => UserCubit()..initWebView()..fetchAllDocuments(),
+      create: (BuildContext context) => UserCubit()..initWebView()..fetchAllData(),
       child: BlocConsumer<UserCubit, UserStates>(
         listener: (context, state) {},
         builder: (context, state) {

@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:illa_logs_app/layout/cubit/states.dart';
 import 'package:webview_windows/webview_windows.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 
 class UserCubit extends Cubit<UserStates>{
@@ -30,6 +29,12 @@ class UserCubit extends Cubit<UserStates>{
   }
 
 ///firestore fetch data
+  Future fetchAllData() async{
+    var response = await FirebaseFirestore.instance.collection('users').get();
+    for(var data in response.docs){
+      print(data.data());
+    }
+  }
 /*  var _lastDocument;
   List<String> tripsLog = [];
   List<String> tripsState = [];
@@ -65,7 +70,8 @@ class UserCubit extends Cubit<UserStates>{
   }*/
 
 
-  List<Map<String, String>> logs = [];
+
+/*  List<Map<String, String>> logs = [];
   Future fetchAllDocuments() async {
     emit(UserLogsLoadingState());
     const url = 'https://firestore.googleapis.com/v1/projects/illa-logs-dummy/databases/(default)/documents/users?orderBy=trips';
@@ -100,9 +106,9 @@ class UserCubit extends Cubit<UserStates>{
       emit(UserLogsFailedState());
       throw Exception('Failed to fetch documents: ${response.body}');
     }
-  }
+  }*/
 
-  var sortChoice;
+/*  var sortChoice;
   sortData({var preference = 'by log'}) {
     if(preference == 'by state'){
       logs.sort((a, b) => a['state']!.compareTo(b['state']!));
@@ -111,7 +117,7 @@ class UserCubit extends Cubit<UserStates>{
       logs.sort((a, b) => a['log']!.compareTo(b['log']!));
       emit(UserLogsSortByLogsState());
     }
-  }
+  }*/
 
 
 ///scroll listener for pagination
