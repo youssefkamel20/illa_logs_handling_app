@@ -1,0 +1,22 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "illa-logs-dummy",
+          "appId": "1:656296710809:android:f26eed6b7b7c5c7fba1e08",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "illa-logs-dummy",
+          "configurations": {
+            "android": "1:656296710809:android:f26eed6b7b7c5c7fba1e08",
+            "windows": "1:656296710809:web:fd932313ca59e95bba1e08"
+          }
+        }
+      }
+    }
+  }
+}

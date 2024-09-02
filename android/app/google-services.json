@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "656296710809",
+    "firebase_url": "https://illa-logs-dummy-default-rtdb.firebaseio.com",
+    "project_id": "illa-logs-dummy",
+    "storage_bucket": "illa-logs-dummy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656296710809:android:f26eed6b7b7c5c7fba1e08",
+        "android_client_info": {
+          "package_name": "com.example.illa_logs_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBprrE7KhwbOb-P-kyKPNxYEtUmI6z2obo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

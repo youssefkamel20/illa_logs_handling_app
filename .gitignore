@@ -9,6 +9,8 @@
 .history
 .svn/
 migrate_working_dir/
+.metadata
+pubspec.lock
 
 # IntelliJ related
 *.iml
@@ -41,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/ios/Flutter/Generated.xcconfig
+/ios/Runner/GeneratedPluginRegistrant.h
+/ios/Runner/GeneratedPluginRegistrant.m
