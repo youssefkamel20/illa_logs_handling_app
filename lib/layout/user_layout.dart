@@ -14,7 +14,6 @@ class UserLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width - 30;
 
 
     return BlocProvider(
@@ -70,6 +69,7 @@ class UserLayout extends StatelessWidget {
                         ],
                       ),
                     ),
+                    ///User-trips sentence and its container to view the data
                     const SizedBox(height: 40,),
                     const Align(
                       alignment: Alignment.centerLeft,

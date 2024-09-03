@@ -28,13 +28,39 @@ class UserCubit extends Cubit<UserStates>{
     }
   }
 
+///Log Index Extractor
+  String _logIndexExtractor (String logData){
+    final startIndex = logData.indexOf('[');
+    final endIndex = logData.indexOf(']');
+    var index = '';
+    if(startIndex != -1 && endIndex != -1 && startIndex < endIndex){
+      index = logData.substring(startIndex + 1, endIndex);
+    }
+    return index;
+  }
+
+  tryingLimit(path){
+
+  }
+
 ///firestore fetch data
+  List<Map<String, String>> logs =[];
   Future fetchAllData() async{
-    var response = await FirebaseFirestore.instance.collection('users').get();
+    final response = await FirebaseFirestore.instance.collection('users').get();
     for(var data in response.docs){
-      print(data.data());
+      print(data.id);
+      final response = await FirebaseFirestore.instance.collection('users').doc(data.id).collection('trips-logs').get();
+      for(var tripDoc in response.docs){
+        final logsData = tripDoc['logs'] as Map<String, dynamic>;
+        for(var log in logsData.values){
+          final logIndex = _logIndexExtractor(log);
+          logs.add({'log': log, 'state' : logIndex});
+        }
+      }
     }
   }
+
+
 /*  var _lastDocument;
   List<String> tripsLog = [];
   List<String> tripsState = [];
@@ -70,45 +96,7 @@ class UserCubit extends Cubit<UserStates>{
   }*/
 
 
-
-/*  List<Map<String, String>> logs = [];
-  Future fetchAllDocuments() async {
-    emit(UserLogsLoadingState());
-    const url = 'https://firestore.googleapis.com/v1/projects/illa-logs-dummy/databases/(default)/documents/users?orderBy=trips';
-    final response = await http.get(Uri.parse(url));
-
-    ///handling response
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final documents = data['documents'] as List<dynamic>; //storing the whole response as list
-      documents.map((doc) => doc as Map<String, dynamic>).toList(); //recalling the items inside the list as map
-
-      ///fetching data in each document
-      for(var doc in documents) {
-        final fields = doc['fields'] as Map<String, dynamic>;
-        final trips = fields['trips']['mapValue']['fields'] as Map<String, dynamic> ?? {};
-
-        ///fetching trip value in trips data
-        for (var trip in trips.values) {
-          final tripFields = trip['mapValue']['fields'] as Map<String, dynamic>;
-          final log = tripFields['log']?['stringValue'];
-          final state = tripFields['state']?['stringValue'];
-          if (log != null && state != null) {
-            logs.add({'log' : log, 'state' : state});
-          }
-        }
-      }
-
-      //logs.sort((a, b) => a['log']!.compareTo(b['log']!));
-      emit(UserLogsSuccessState());
-      print(logs);
-    }else {
-      emit(UserLogsFailedState());
-      throw Exception('Failed to fetch documents: ${response.body}');
-    }
-  }*/
-
-/*  var sortChoice;
+  var sortChoice;
   sortData({var preference = 'by log'}) {
     if(preference == 'by state'){
       logs.sort((a, b) => a['state']!.compareTo(b['state']!));
@@ -117,7 +105,7 @@ class UserCubit extends Cubit<UserStates>{
       logs.sort((a, b) => a['log']!.compareTo(b['log']!));
       emit(UserLogsSortByLogsState());
     }
-  }*/
+  }
 
 
 ///scroll listener for pagination
