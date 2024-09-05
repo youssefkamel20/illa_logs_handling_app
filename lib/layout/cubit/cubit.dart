@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:illa_logs_app/layout/cubit/states.dart';
 import 'package:webview_windows/webview_windows.dart';
@@ -11,6 +12,8 @@ class UserCubit extends Cubit<UserStates>{
     return BlocProvider.of(context);
   }
 
+  var userIdController = TextEditingController();
+  var userTripController = TextEditingController();
   late WebviewController _controller;
   late Webview webview;
   Future<void> initWebView() async {
@@ -77,18 +80,14 @@ class UserCubit extends Cubit<UserStates>{
     }
   }
 
+
 ///Search in UserTrip
   var searchUserId = '';
-  var searchUserName = '';
   List<String> allTripsSearchData = [];
   searchForUserTrips(String path) async{
     allTripsSearchData.clear();
     emit(UserSearchLoadingState());
     try {
-      ///Get user info
-      final userResponse = await FirebaseFirestore.instance.collection('users').doc(path).get();
-      searchUserName = userResponse.data()!['user_name'];
-
       ///get user trips info
       final response = await FirebaseFirestore.instance.collection('users').doc(path).collection('trips-logs').get();
       for(var doc in response.docs) { // accessing each trip doc
@@ -129,6 +128,7 @@ class UserCubit extends Cubit<UserStates>{
     }
   }
 
+
 ///Search for a specific trip
   Future getSpecificTrip(String tripID) async{
     emit(UserLogsUpdateLoadingState());
@@ -138,6 +138,9 @@ class UserCubit extends Cubit<UserStates>{
         final trips = await FirebaseFirestore.instance.collection('users').doc(user.id).collection('trips-logs').get();
         for(var trip in trips.docs){
           if(tripID == trip.id){
+            searchUserId = user.id;
+            userIdController.text = user.id;
+            searchForUserTrips(user.id);
             logs.clear();
             final logValues = trip.data()['logs'] as Map<String, dynamic>;
             for (var logData in logValues.entries) {
@@ -156,6 +159,7 @@ class UserCubit extends Cubit<UserStates>{
     }
   }
 
+
 ///Sort Logs
   var sortChoice;
   sortData({var preference = 'by log'}) {
@@ -167,6 +171,16 @@ class UserCubit extends Cubit<UserStates>{
       emit(UserLogsSortByLogsState());
     }
   }
+
+
+///Toggle logs view
+  bool isLogsShowen = true;
+  toggleLogView (){
+    isLogsShowen =! isLogsShowen;
+    print(isLogsShowen);
+    emit(UserLogsViewUpdateState());
+  }
+
 
 
 ///scroll listener for pagination

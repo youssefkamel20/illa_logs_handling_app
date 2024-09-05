@@ -16,8 +16,14 @@ Widget defaultFormField({
       width: 300,
       height: 35,
       child: TextFormField(
+        textAlign: TextAlign.start,
         onFieldSubmitted: onSubmit,
         controller: controller,
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          fontStyle: FontStyle.italic,
+        ),
         decoration: const InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -90,13 +96,14 @@ Widget defaultUserTripsViewer({
   height: 50,
   decoration: BoxDecoration(
     borderRadius: BorderRadius.circular(15),
+    border: Border.all(color: Colors.grey, width: 1),
     color: Colors.grey[200],
   ),
   padding: const EdgeInsets.symmetric(horizontal: 10),
   child: Row(
     children: [
       ///Trip ID
-      Expanded(child: Text('$logID')),
+      Expanded(child: Text(logID)),
     ],
   ),
 );

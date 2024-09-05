@@ -7,8 +7,6 @@ class UserMapLoadingState extends UserStates{}
 class UserMapSuccessState extends UserStates{}
 class UserMapFailedState extends UserStates{}
 
-//   ///Container Resizing States
-// class UserDragUpdateState extends UserStates{}
 
   ///Logs Loading States
 class UserLogsLoadingState extends UserStates{}
@@ -19,11 +17,6 @@ class UserLogsFailedState extends UserStates{}
 class UserLogsSortByStatesState extends UserStates{}
 class UserLogsSortByLogsState extends UserStates{}
 
-//   ///Logs Pagination States
-// class UserLogsPaginationLoadingState extends UserStates{}
-// class UserLogsPaginationSuccessState extends UserStates{}
-// class UserLogsPaginationFailedState extends UserStates{}
-
   ///User Trips Search States
 class UserSearchLoadingState extends UserStates{}
 class UserSearchSuccessState extends UserStates{}
@@ -33,3 +26,6 @@ class UserSearchFailedState extends UserStates{}
 class UserLogsUpdateLoadingState extends UserStates{}
 class UserLogsUpdateSuccessState extends UserStates{}
 class UserLogsUpdateFailedState extends UserStates{}
+
+  /// Toggle logs view States
+class UserLogsViewUpdateState extends UserStates{}
