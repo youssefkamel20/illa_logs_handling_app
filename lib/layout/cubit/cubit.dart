@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:illa_logs_app/layout/cubit/states.dart';
 import 'package:webview_windows/webview_windows.dart';
@@ -39,63 +38,125 @@ class UserCubit extends Cubit<UserStates>{
     return index;
   }
 
-  tryingLimit(path){
-
+///Log Data Extractor
+  String _logDataExtractor (String logData){
+    var _result = '';
+    int index = logData.indexOf('TRIP_LOGGER: ');
+    if (index != -1){
+      _result = logData.substring(index + 'TRIP_LOGGER: '.length);
+    } else {
+      return _result;
+    }
+    return _result;
   }
 
 ///firestore fetch data
   List<Map<String, String>> logs =[];
   Future fetchAllData() async{
-    final response = await FirebaseFirestore.instance.collection('users').get();
-    for(var data in response.docs){
-      print(data.id);
-      final response = await FirebaseFirestore.instance.collection('users').doc(data.id).collection('trips-logs').get();
-      for(var tripDoc in response.docs){
-        final logsData = tripDoc['logs'] as Map<String, dynamic>;
-        for(var log in logsData.values){
-          final logIndex = _logIndexExtractor(log);
-          logs.add({'log': log, 'state' : logIndex});
+    emit(UserLogsLoadingState());
+    try {
+      final response = await FirebaseFirestore.instance.collection('users').get(); //Get user Docs
+      for(var data in response.docs){
+        final response = await FirebaseFirestore.instance.collection('users').doc(data.id).collection('trips-logs').get();
+        for(var tripDoc in response.docs){
+          final logsData = tripDoc['logs'] as Map<String, dynamic>;
+          for(var logKey in logsData.keys){ //to access timeStamp of the log
+            for(var logData in logsData.values){ // to access log value in each log
+              final date = logKey.toString();
+              final logIndex = _logIndexExtractor(logData);
+              final log = _logDataExtractor(logData);
+              logs.add({'log': log, 'state' : logIndex, 'date' : date});
+            }
+          }
         }
       }
+      emit(UserLogsSuccessState());
+    } catch (error){
+      emit(UserLogsFailedState());
+      print('Error caught on cubit.fetchAllData: $error');
     }
   }
 
-
-/*  var _lastDocument;
-  List<String> tripsLog = [];
-  List<String> tripsState = [];
-  Future firestoreInitialFetchData() async {
-    emit(UserLogsLoadingState());
-
+///Search in UserTrip
+  var searchUserId = '';
+  var searchUserName = '';
+  List<String> allTripsSearchData = [];
+  searchForUserTrips(String path) async{
+    allTripsSearchData.clear();
+    emit(UserSearchLoadingState());
     try {
-      var allData = await Firestore.instance.collection('users').orderBy('trips').limit(5).get(); //fetching for firebase data
-      _lastDocument = allData.isNotEmpty? allData.last : null ;
-      ///accessing each doc trips and fetching for each trip logs and state
-      for (var eachDoc in allData) {
-        var _tripsMap = eachDoc['trips'];
-        if (_tripsMap != null) {
-          _tripsMap.forEach((key, value) {
-            tripsLog.add(value['log']); //adding logs to the list
-            tripsState.add(value['state']);
-          });
-        }
+      ///Get user info
+      final userResponse = await FirebaseFirestore.instance.collection('users').doc(path).get();
+      searchUserName = userResponse.data()!['user_name'];
+
+      ///get user trips info
+      final response = await FirebaseFirestore.instance.collection('users').doc(path).collection('trips-logs').get();
+      for(var doc in response.docs) { // accessing each trip doc
+        allTripsSearchData.add(doc.id); // add main info of each trip to a list
       }
-      //print(tripsLog);
-      *//*await allData.add({
-        'trips': {
-          'trip 1' : {'state' : 'E', 'log':'trip 15.1 log'},
-          'trip 2' : {'state' : 'I', 'log':'trip 15.2 log'},
-          'trip 3' : {'state' : 'W', 'log':'trip 15.3 log'},
-          'trip 4' : {'state' : 'W', 'log':'trip 15.4 log'},
-        },
-      });*//*
-      emit(UserLogsSuccessState());
-    } catch (error) {
+      emit(UserSearchSuccessState());
+    } catch(error){
+      emit(UserSearchFailedState());
       print(error.toString());
     }
-  }*/
+  }
 
+///Open UserTrip in logs
+  Future getUserTripLogs(int index) async{
+    emit(UserLogsUpdateLoadingState());
+    logs.clear();
+    final tripLogPath = allTripsSearchData[index];
+    try{
+      final response = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(searchUserId)
+          .collection('trips-logs')
+          .doc(tripLogPath)
+          .get();
+      final logsValues = response.data()!['logs'] as Map<String, dynamic>;
+        for (var logData in logsValues.entries) {
+          final logIndex = _logIndexExtractor(logData.value);
+          final logValue = _logDataExtractor(logData.value);
+          final logDate = logData.key;
+          logs.add({'log': logValue, 'state' : logIndex, 'date' : logDate});
+        }
 
+      print('This Trip contains: ${logs.length} log');
+      emit(UserLogsUpdateSuccessState());
+    } catch (error){
+      emit(UserLogsUpdateFailedState());
+      print(error.toString());
+    }
+  }
+
+///Search for a specific trip
+  Future getSpecificTrip(String tripID) async{
+    emit(UserLogsUpdateLoadingState());
+    try {
+      final users = await FirebaseFirestore.instance.collection('users').get();
+      for(var user in users.docs){
+        final trips = await FirebaseFirestore.instance.collection('users').doc(user.id).collection('trips-logs').get();
+        for(var trip in trips.docs){
+          if(tripID == trip.id){
+            logs.clear();
+            final logValues = trip.data()['logs'] as Map<String, dynamic>;
+            for (var logData in logValues.entries) {
+              final logIndex = _logIndexExtractor(logData.value);
+              final logValue = _logDataExtractor(logData.value);
+              final logDate = logData.key;
+              logs.add({'log': logValue, 'state' : logIndex, 'date' : logDate});
+            }
+          }
+        }
+      }
+      emit(UserLogsUpdateSuccessState());
+    } catch(error){
+      emit(UserLogsUpdateFailedState());
+      print(error.toString());
+    }
+  }
+
+///Sort Logs
   var sortChoice;
   sortData({var preference = 'by log'}) {
     if(preference == 'by state'){

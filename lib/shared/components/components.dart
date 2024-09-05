@@ -1,21 +1,22 @@
-import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 
 Widget defaultFormField({
   required titleText,
   required controller,
+  var onSubmit,
 }) =>  Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
     Padding(
       padding: const EdgeInsets.only(left: 15.0),
-      child: Text("$titleText", style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
+      child: Text("$titleText", style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
     ),
     const SizedBox(height: 5,),
     Container(
       width: 300,
       height: 35,
       child: TextFormField(
+        onFieldSubmitted: onSubmit,
         controller: controller,
         decoration: const InputDecoration(
           border: OutlineInputBorder(
@@ -30,52 +31,72 @@ Widget defaultFormField({
 
 Widget defaultLogsViewer({
   required logState,
+  required logDate,
   required logData,
-  // required bool panelController,
-}) => Column(
-  children: [
-    Container(
-      width: double.infinity,
-      clipBehavior: Clip.antiAlias,
-      height: 35,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        children: [
-          Container(
+}) => Container(
+  width: double.infinity,
+  clipBehavior: Clip.antiAlias,
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(20),
+  ),
+  child: IntrinsicHeight(
+    child: Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: Container(
             width: 50,
-            color: logState == 'W'? Colors.green: logState == 'I'? Colors.yellow[700] : Colors.red ,
             alignment: Alignment.center,
-            height: double.infinity,
-            child: Text('$logState',
-              style: TextStyle(
+            color: logState == 'W' ? Colors.green : logState == 'I' ? Colors.yellow[700] : Colors.red,
+            child: Text(
+              '$logState',
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text('$logData',
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
+        ),
+        Expanded(
+          flex: 12,
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$logDate :',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                const SizedBox(height: 8.0,),
+                Text('$logData'),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     ),
-    /*ConditionalBuilder(
-      condition: panelController,
-      builder: (context) => Container(
-        color: Colors.white.withOpacity(0.7),
-        width: double.infinity,
-        height: 50,
-      ),
-      fallback: (context) => Container(),
-    ),*/
-  ],
+  ),
+);
+
+Widget defaultUserTripsViewer({
+  required String logID,
+}) => Container(
+  width: double.infinity,
+  height: 50,
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(15),
+    color: Colors.grey[200],
+  ),
+  padding: const EdgeInsets.symmetric(horizontal: 10),
+  child: Row(
+    children: [
+      ///Trip ID
+      Expanded(child: Text('$logID')),
+    ],
+  ),
 );

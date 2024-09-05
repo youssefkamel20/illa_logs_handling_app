@@ -33,9 +33,22 @@ class UserLayout extends StatelessWidget {
                     ///row for search fields
                     Row(
                       children: [
-                        defaultFormField(titleText: 'User ID', controller: userIdController,),
+                        defaultFormField(
+                          titleText: 'User ID',
+                          controller: userIdController,
+                          onSubmit: (query){
+                            cubit.searchUserId = query;
+                            cubit.searchForUserTrips(query);
+                          }
+                        ),
                         Spacer(),
-                        defaultFormField(titleText: 'Trip ID', controller: userTripController,),
+                        defaultFormField(
+                          titleText: 'Trip ID',
+                          controller: userTripController,
+                          onSubmit: (query){
+                            cubit.getSpecificTrip(query);
+                          }
+                        ),
                         const SizedBox(
                           width: 20,
                         ),
@@ -89,6 +102,7 @@ class UserLayout extends StatelessWidget {
                   ),
                       child: UserTripsScreen(),
                     ),
+                    //const SizedBox(height: 80,),
                   ],
                 ),
               ),

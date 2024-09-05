@@ -74,8 +74,10 @@ class LogsScreen extends StatelessWidget {
               ),
               Expanded(
                 child: ListView.separated(
+                  shrinkWrap: true,
                   itemBuilder: (context, index) {
                     return defaultLogsViewer(
+                      logDate: cubit.logs[index]['date'],
                       logState: cubit.logs[index]['state'],
                       logData: cubit.logs[index]['log'],
                       //panelController: false,
