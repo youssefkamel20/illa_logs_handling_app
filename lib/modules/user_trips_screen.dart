@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:illa_logs_app/layout/cubit/cubit.dart';
 import 'package:illa_logs_app/layout/cubit/states.dart';
-import '../layout/user_layout.dart';
 import '../shared/components/components.dart';
 
 class UserTripsScreen extends StatelessWidget {
