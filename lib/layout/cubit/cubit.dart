@@ -8,9 +8,7 @@ import 'package:webview_windows/webview_windows.dart';
 class UserCubit extends Cubit<UserStates>{
   UserCubit() : super(UserInitialState());
 
-  static UserCubit get(context) {
-    return BlocProvider.of(context);
-  }
+  static UserCubit get(context) => BlocProvider.of(context);
 
   var userIdController = TextEditingController();
   var userTripController = TextEditingController();
@@ -166,19 +164,27 @@ class UserCubit extends Cubit<UserStates>{
     if(preference == 'by state'){
       logs.sort((a, b) => a['state']!.compareTo(b['state']!));
       emit(UserLogsSortByStatesState());
-    } else if(preference == 'by log'){
-      logs.sort((a, b) => a['log']!.compareTo(b['log']!));
+    } else if(preference == 'by date'){
+      logs.sort((a, b) => a['date']!.compareTo(b['date']!));
       emit(UserLogsSortByLogsState());
     }
   }
 
 
-///Toggle logs view
+///Toggle
   bool isLogsShowen = true;
+  bool isWebShowen = true;
   toggleLogView (){
     isLogsShowen =! isLogsShowen;
     print(isLogsShowen);
     emit(UserLogsViewUpdateState());
+  }
+  toggleWebView(){
+    isWebShowen =! isWebShowen;
+    emit(UserWebViewUpdateState());
+  }
+  resizeWebView(DragUpdateDetails details){
+
   }
 
 

@@ -1,3 +1,4 @@
+
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,11 +8,23 @@ import 'package:illa_logs_app/modules/user_trips_screen.dart';
 import 'package:illa_logs_app/shared/components/components.dart';
 import '../modules/logs_screen.dart';
 
-class UserLayout extends StatelessWidget {
+class UserLayout extends StatefulWidget {
+
+  @override
+  State<UserLayout> createState() => _UserLayoutState();
+}
+
+class _UserLayoutState extends State<UserLayout> {
+  double logsWidth = 0;
+  double webWidth = 0;
 
   @override
   Widget build(BuildContext context) {
-
+    if (logsWidth == 0 && webWidth == 0) {
+      // Initialize widths only once based on screen width
+      logsWidth = MediaQuery.of(context).size.width / 2 - 19;
+      webWidth = MediaQuery.of(context).size.width / 2 - 19;
+    }
 
     return BlocProvider(
       create: (BuildContext context) => UserCubit()..initWebView()..fetchAllData(),
@@ -27,14 +40,14 @@ class UserLayout extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 10.0, top: 13),
                 child: cubit.isLogsShowen
                     ? IconButton(
-                        onPressed: () {
-                          cubit.toggleLogView();
-                        },
-                        icon: const Icon(Icons.arrow_back_ios_rounded, size: 18,),)
+                  onPressed: () {
+                    cubit.toggleLogView();
+                  },
+                  icon: const Icon(Icons.arrow_back_ios_rounded, size: 18,),)
                     : Image.asset(
-                        'images/illaiconpic_png.png',
-                        alignment: Alignment.center,
-                      ),
+                  'images/illaiconpic_png.png',
+                  alignment: Alignment.center,
+                ),
               ),
               ///row for search fields
               title: Row(
@@ -99,24 +112,100 @@ class UserLayout extends StatelessWidget {
                     child: Container(
                       clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15.0),
+                          color: Colors.grey[700],
+                          borderRadius: BorderRadius.circular(17.0),
+                          border: Border.all(color: Colors.grey, width: 2)
                       ),
                       child: Row(
                         children: [
                           ///logs presenting area
                           Expanded(
-                            child: LogsScreen(),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                minWidth: 300,
+                              ),
+                              child: Container(
+                                width: logsWidth,
+                                child: LogsScreen(),
+                              ),
+                            ),
                           ),
-
                           ///geoJson area
-                          Expanded(
+                          if (cubit.isWebShowen) Row(
+                            children: [
+                              GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onHorizontalDragUpdate: (details) {
+                                  setState(() {
+                                    // Add boundary conditions for resizing
+                                    if (logsWidth + details.delta.dx > 300 &&  webWidth - details.delta.dx > 100) {
+                                      logsWidth += details.delta.dx;
+                                      webWidth -= details.delta.dx;
+                                    }
+                                  });
+                                },
+                                child: MouseRegion(
+                                  cursor: SystemMouseCursors.resizeColumn,
+                                  child: Container(
+                                    width: 4,
+                                    color: Colors.grey[800],
+                                    child: Center(
+                                      child: Container(
+                                        height: double.infinity,
+                                        width: 2,
+                                        color: Colors.grey[900], // Thin line in the center like Excel
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  Container(
+                                    width: webWidth,
+                                    clipBehavior: Clip.antiAlias,
+                                    decoration: const BoxDecoration(
+                                      borderRadius: BorderRadius.horizontal(right: Radius.circular(15),),
+                                    ),
+                                    child: ConditionalBuilder(
+                                      condition: state is! UserMapLoadingState,
+                                      builder: (context) => cubit.webview,
+                                      fallback: (context) => const Center(
+                                          child: CircularProgressIndicator()),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      cubit.toggleWebView();
+                                    },
+                                    icon: Icon(Icons.close,
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ) else InkWell(
+                            onTap: (){
+                              cubit.toggleWebView();
+                            },
                             child: Container(
-                              color: Colors.transparent,
-                              child: ConditionalBuilder(
-                                condition: state is! UserMapLoadingState,
-                                builder: (context) => cubit.webview,
-                                fallback: (context) => const Center(
-                                    child: CircularProgressIndicator()),
+                              width: 20,
+                              height: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[700],
+                                borderRadius: const BorderRadius.horizontal(right: Radius.circular(15),),
+                              ),
+                              child: const RotatedBox(
+                                quarterTurns: 3,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('GeoJson' , style: TextStyle(fontWeight: FontWeight.bold),),
+                                    Icon(Icons.keyboard_arrow_up_outlined, ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),

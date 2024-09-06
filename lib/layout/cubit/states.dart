@@ -27,5 +27,6 @@ class UserLogsUpdateLoadingState extends UserStates{}
 class UserLogsUpdateSuccessState extends UserStates{}
 class UserLogsUpdateFailedState extends UserStates{}
 
-  /// Toggle logs view States
+  /// Toggle view States
 class UserLogsViewUpdateState extends UserStates{}
+class UserWebViewUpdateState extends UserStates{}
