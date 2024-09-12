@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 Widget defaultFormField({
   required titleText,
@@ -19,7 +20,7 @@ Widget defaultFormField({
         textAlign: TextAlign.start,
         onFieldSubmitted: onSubmit,
         controller: controller,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w500,
           fontStyle: FontStyle.italic,
@@ -42,49 +43,39 @@ Widget defaultLogsViewer({
 }) => Container(
   width: double.infinity,
   clipBehavior: Clip.antiAlias,
+  padding: const EdgeInsets.symmetric(horizontal: 10.0),
   decoration: BoxDecoration(
     color: Colors.white,
-    borderRadius: BorderRadius.circular(20),
+    borderRadius: BorderRadius.circular(5.0),
   ),
   child: IntrinsicHeight(
     child: Row(
       children: [
-        Expanded(
-          flex: 1,
-          child: Container(
-            width: 50,
-            alignment: Alignment.center,
-            color: logState == 'W' ? Colors.green : logState == 'I' ? Colors.yellow[700] : Colors.red,
-            child: Text(
-              '$logState',
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+        Container(
+          width: 85,
+          height: 20,
+          child: Row(
+            children: [
+              if(logState == 'I') Icon(Icons.info, color: HexColor('6A8759'), size: 19,)
+              else if(logState == 'E') Icon(Icons.error, color: HexColor('CF5B56'), size: 19,)
+              else if(logState == 'W') Icon(Icons.info, color: HexColor('BBB529'), size: 19,),
+              const SizedBox(width: 5.0,),
+              if(logState == 'I') Text('Info', style: TextStyle(color: HexColor('6A8759'), fontWeight: FontWeight.bold),)
+              else if(logState == 'E') Text('Error', style: TextStyle(color: HexColor('CF5B56'), fontWeight: FontWeight.bold),)
+              else if(logState == 'W') Text('Warning', style: TextStyle(color: HexColor('BBB529'), fontWeight: FontWeight.bold),),
+            ],
           ),
         ),
-        Expanded(
-          flex: 12,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$logDate :',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                const SizedBox(height: 8.0,),
-                Text('$logData'),
-              ],
-            ),
-          ),
+        const SizedBox(width: 10,),
+        Container(
+          width: 170,
+          child: Text('$logDate'),
         ),
-      ],
+        const SizedBox(width: 12,),
+            Expanded(
+              child: SelectableText('$logData'),
+            ),
+          ],
     ),
   ),
 );

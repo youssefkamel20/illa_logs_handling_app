@@ -12,6 +12,7 @@ class UserCubit extends Cubit<UserStates>{
 
   var userIdController = TextEditingController();
   var userTripController = TextEditingController();
+  TextEditingController logSearchController = TextEditingController();
   late WebviewController _controller;
   late Webview webview;
   Future<void> initWebView() async {
@@ -53,53 +54,115 @@ class UserCubit extends Cubit<UserStates>{
 
 ///firestore fetch data
   List<Map<String, String>> logs =[];
-  Future fetchAllData() async{
-    emit(UserLogsLoadingState());
-    try {
-      final response = await FirebaseFirestore.instance.collection('users').get(); //Get user Docs
-      for(var data in response.docs){
-        final response = await FirebaseFirestore.instance.collection('users').doc(data.id).collection('trips-logs').get();
-        for(var tripDoc in response.docs){
-          final logsData = tripDoc['logs'] as Map<String, dynamic>;
-          for(var logKey in logsData.keys){ //to access timeStamp of the log
-            for(var logData in logsData.values){ // to access log value in each log
-              final date = logKey.toString();
-              final logIndex = _logIndexExtractor(logData);
-              final log = _logDataExtractor(logData);
-              logs.add({'log': log, 'state' : logIndex, 'date' : date});
-            }
-          }
-        }
-      }
-      emit(UserLogsSuccessState());
-    } catch (error){
-      emit(UserLogsFailedState());
-      print('Error caught on cubit.fetchAllData: $error');
-    }
-  }
+  List<Map<String, String>> searchedLogs = [];
+  List<Map<String, String>> filteredLogs = [];
 
 
-///Search in UserTrip
+///Search
   var searchUserId = '';
+  var searchLogString = '';
+  String errorMessage = '';
+  bool errorOccurred = false;
+  bool isSearchPressed = false;
+  int statesErrorCount = 0;
+  int statesWarningCount = 0;
+  int statesInfoCount = 0;
   List<String> allTripsSearchData = [];
+  //Search for UserTrips
   searchForUserTrips(String path) async{
     allTripsSearchData.clear();
     emit(UserSearchLoadingState());
     try {
       ///get user trips info
-      final response = await FirebaseFirestore.instance.collection('users').doc(path).collection('trips-logs').get();
-      for(var doc in response.docs) { // accessing each trip doc
-        allTripsSearchData.add(doc.id); // add main info of each trip to a list
+      final user = await FirebaseFirestore.instance.collection('users').doc(path).get();
+      ///Check if the user exists
+      if (user.exists){
+        final trips = await FirebaseFirestore.instance.collection('users').doc(path).collection('trips-logs').get();
+        for(var trip in trips.docs) { // accessing each trip doc
+          allTripsSearchData.add(trip.id); // add main info of each trip to a list
+        }
+        emit(UserSearchSuccessState());
       }
-      emit(UserSearchSuccessState());
+      else{
+        emit(UserSearchFailedState());
+      }
+
     } catch(error){
       emit(UserSearchFailedState());
       print(error.toString());
     }
   }
+  //Search for a specific trip
+  Future getSpecificTrip(String tripID) async{
+    emit(TripSearchLoadingState());
+    try {
+      final users = await FirebaseFirestore.instance.collection('users').get();
+      for(var user in users.docs){
+        final trip = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.id)
+            .collection('trips-logs')
+            .doc(tripID)
+            .get();
+        if(trip.exists){
+          searchUserId = user.id;
+          userIdController.text = user.id;
+          searchForUserTrips(user.id);
+          logs.clear();
+
+          final logValues = trip.data()!['logs'] as Map<String, dynamic>;
+
+          for (var logData in logValues.entries) {
+            final logIndex = _logIndexExtractor(logData.value);
+            final logValue = _logDataExtractor(logData.value);
+            final logDate = logData.key;
+            logs.add({'log': logValue, 'state' : logIndex, 'date' : logDate});
+          }
+          emit(TripSearchSuccessState());
+          break;
+        }
+        else{
+          emit(TripSearchFailedState());
+        }
+      }
+      ///Count log States
+      logs.forEach((log) {
+        if(log['state'] == 'E'){
+          statesErrorCount++;
+        } else if(log['state'] == 'W'){
+          statesWarningCount++;
+        } else if(log['state'] == 'I'){
+          statesInfoCount++;
+        }
+      });
+    } catch(error){
+      emit(TripSearchFailedState());
+      print(error.toString());
+    }
+  }
+  //Search in logs Data
+  searchInLogs(){
+    try {
+      if (logSearchController.text.isEmpty) {
+        searchedLogs = logs;
+      } else {
+        searchedLogs = logs.where((log) {
+          return log['log']!.toLowerCase().contains(searchLogString.toLowerCase());
+        }).toList();
+      }
+      emit(UserLogsUpdateSuccessState());
+    } catch (error){
+      print('Error while searchInLogs function : $error');
+      emit(UserLogsUpdateFailedState());
+    }
+
+  }
 
 ///Open UserTrip in logs
   Future getUserTripLogs(int index) async{
+    statesErrorCount = 0;
+    statesWarningCount = 0;
+    statesInfoCount = 0;
     emit(UserLogsUpdateLoadingState());
     logs.clear();
     final tripLogPath = allTripsSearchData[index];
@@ -119,39 +182,18 @@ class UserCubit extends Cubit<UserStates>{
         }
 
       print('This Trip contains: ${logs.length} log');
+      ///Count log States
+      logs.forEach((log) {
+        if(log['state'] == 'E'){
+          statesErrorCount++;
+        } else if(log['state'] == 'W'){
+          statesWarningCount++;
+        } else if(log['state'] == 'I'){
+          statesInfoCount++;
+        }
+      });
       emit(UserLogsUpdateSuccessState());
     } catch (error){
-      emit(UserLogsUpdateFailedState());
-      print(error.toString());
-    }
-  }
-
-
-///Search for a specific trip
-  Future getSpecificTrip(String tripID) async{
-    emit(UserLogsUpdateLoadingState());
-    try {
-      final users = await FirebaseFirestore.instance.collection('users').get();
-      for(var user in users.docs){
-        final trips = await FirebaseFirestore.instance.collection('users').doc(user.id).collection('trips-logs').get();
-        for(var trip in trips.docs){
-          if(tripID == trip.id){
-            searchUserId = user.id;
-            userIdController.text = user.id;
-            searchForUserTrips(user.id);
-            logs.clear();
-            final logValues = trip.data()['logs'] as Map<String, dynamic>;
-            for (var logData in logValues.entries) {
-              final logIndex = _logIndexExtractor(logData.value);
-              final logValue = _logDataExtractor(logData.value);
-              final logDate = logData.key;
-              logs.add({'log': logValue, 'state' : logIndex, 'date' : logDate});
-            }
-          }
-        }
-      }
-      emit(UserLogsUpdateSuccessState());
-    } catch(error){
       emit(UserLogsUpdateFailedState());
       print(error.toString());
     }
@@ -161,30 +203,64 @@ class UserCubit extends Cubit<UserStates>{
 ///Sort Logs
   var sortChoice;
   sortData({var preference = 'by log'}) {
-    if(preference == 'by state'){
-      logs.sort((a, b) => a['state']!.compareTo(b['state']!));
+    if(preference == 'level'){
+      filteredLogs.sort((a, b) => a['state']!.compareTo(b['state']!));
       emit(UserLogsSortByStatesState());
-    } else if(preference == 'by date'){
-      logs.sort((a, b) => a['date']!.compareTo(b['date']!));
+    } else if(preference == 'date'){
+      filteredLogs.sort((a, b) => a['date']!.compareTo(b['date']!));
       emit(UserLogsSortByLogsState());
+    }
+  }
+
+///Filter Logs
+  List<String> selectedOptions =[];
+  filterData (){
+    try {
+      if(selectedOptions.isEmpty){
+        filteredLogs = logs;
+      }
+      else{
+        if(selectedOptions.contains('Error') && selectedOptions.length == 1){
+          filteredLogs = logs.where((log)=> log['state']!.contains('E')).toList();
+        }
+        else if(selectedOptions.contains('Warning') && selectedOptions.length == 1){
+          filteredLogs = logs.where((log)=> log['state']!.contains('W')).toList();
+        }
+        else if(selectedOptions.contains('Info') && selectedOptions.length == 1){
+          filteredLogs = logs.where((log)=> log['state']!.contains('I')).toList();
+        }
+        else if(selectedOptions.contains('Error') && selectedOptions.contains('Warning') && selectedOptions.length == 2) {
+          filteredLogs = logs.where((log)=> log['state']!.contains('E') || log['state']!.contains('W')).toList();
+        }
+        else if(selectedOptions.contains('Error') && selectedOptions.contains('Info') && selectedOptions.length == 2)  {
+          filteredLogs = logs.where((log)=> log['state']!.contains('E') || log['state']!.contains('I')).toList();
+
+        }
+        else if(selectedOptions.contains('Warning') && selectedOptions.contains('Info') && selectedOptions.length == 2) {
+          filteredLogs = logs.where((log)=> log['state']!.contains('I') || log['state']!.contains('W')).toList();
+        }
+        else {
+          filteredLogs = logs;
+        }
+      }
+      emit(LogsFilterUpdateState());
+    } catch (error) {
+      emit(LogsFilterFailedState());
+      print(error.toString());
     }
   }
 
 
 ///Toggle
-  bool isLogsShowen = true;
-  bool isWebShowen = true;
+  bool isLogsShowen = false;
+  bool isWebShowen = false;
   toggleLogView (){
     isLogsShowen =! isLogsShowen;
-    print(isLogsShowen);
     emit(UserLogsViewUpdateState());
   }
   toggleWebView(){
     isWebShowen =! isWebShowen;
     emit(UserWebViewUpdateState());
-  }
-  resizeWebView(DragUpdateDetails details){
-
   }
 
 

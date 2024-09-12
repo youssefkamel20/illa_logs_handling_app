@@ -1,15 +1,27 @@
-import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:illa_logs_app/layout/cubit/cubit.dart';
 import 'package:illa_logs_app/layout/cubit/states.dart';
 import 'package:illa_logs_app/shared/components/components.dart';
 
-class LogsScreen extends StatelessWidget {
-  var sortChoice;
+class LogsScreen extends StatefulWidget {
+  @override
+  State<LogsScreen> createState() => _LogsScreenState();
+}
+
+class _LogsScreenState extends State<LogsScreen> {
+
+  var options =[
+    'Error',
+    'Info',
+    'Warning'
+  ];
+  var selectedChoice;
   var sortPreference =[
-    'by state',
-    'by log'
+    'level',
+    'date',
   ];
 
   @override
@@ -20,10 +32,294 @@ class LogsScreen extends StatelessWidget {
         var cubit = UserCubit.get(context);
 
         return Container(
-          color: Colors.grey[700],
-          child: Column(
+          clipBehavior: Clip.antiAlias,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.horizontal(left: Radius.circular(8),),
+          ),
+         child: Column(
+           children: [
+             ///Title logs
+             Container(
+               height: 40,
+               width: double.infinity,
+               color: HexColor('#e9e9f5'),
+               alignment: Alignment.centerLeft,
+               child: Padding(
+                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                 child: Text('Logs',
+                   textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+               ),
+             ),
+             ///Row for filter, sort and search
+             Container(
+               height: 50,
+               padding: const EdgeInsets.symmetric(horizontal: 16.0),
+               child: Row(
+                 children: [
+                   ///Filter Dropdown Checkbox
+                   Padding(
+                     padding: const EdgeInsets.all(5.0),
+                     child: Container(
+                       width: 100,
+                       padding: const EdgeInsets.all(8.0),
+                       decoration: BoxDecoration(
+                         border: Border.all(color: Colors.grey, width: 1),
+                         borderRadius: BorderRadius.circular(6.0),
+                       ),
+                       child: DropdownButtonHideUnderline(
+                         child: DropdownButton<String>(
+                           alignment: Alignment.center,
+                           isExpanded: true,
+                           menuWidth: 150,
+                           borderRadius: BorderRadius.circular(10),
+                           hint: const Text('Level'),
+                           icon: const Icon(Icons.keyboard_arrow_down),
+                           items: options.map((String option) {
+                             return DropdownMenuItem(
+                               value: option,
+                               child: StatefulBuilder(
+                                 builder: (context, setState) {
+                                   bool isSelected = cubit.selectedOptions.contains(option); //show whether the option is previously selected or not
+                                   return GestureDetector(
+                                     onTap: (){
+                                       setState(() {
+                                         if(isSelected){
+                                           cubit.selectedOptions.remove(option.toString()); //if it was selected the only action is to remove it
+                                         } else {
+                                           cubit.selectedOptions.add(option.toString()); //it it is not on the list add it
+                                         }
+                                         print(cubit.selectedOptions);
+                                         cubit.filterData();
+                                       });
+                                     },
+                                     child: Row(
+                                       children: [
+                                         isSelected == true ? const Icon(Icons.check_box_outlined, color: Colors.black, size: 20,) : const Icon(Icons.check_box_outline_blank, color: Colors.black, size: 20,),
+                                         const SizedBox(width: 8.0,),
+
+                                         ///for option text style
+                                         if(option == 'Info') Expanded(
+                                           child: Text(option,
+                                             style: TextStyle(
+                                               color: HexColor('6A8759'),
+                                             ),
+                                           ),
+                                         )
+                                         else if (option == 'Warning') Expanded(
+                                           child: Text(option,
+                                             style: TextStyle(
+                                               color: HexColor('BBB529'),
+                                             ),
+                                           ),
+                                         )
+                                         else if (option == 'Error') Expanded(
+                                           child: Text(option,
+                                               style: TextStyle(
+                                                 color: HexColor('CF5B56'),
+                                               ),
+                                             ),
+                                         ),
+
+                                         /// for option count
+                                         if(option == 'Info') Text('${cubit.statesInfoCount}',
+                                           style: const TextStyle(
+                                             color: Colors.grey,
+                                           ),
+                                         )
+                                         else if (option == 'Warning') Text('${cubit.statesWarningCount}',
+                                           style: const TextStyle(
+                                             color: Colors.grey,
+                                           ),
+                                         )
+                                         else if (option == 'Error') Text('${cubit.statesErrorCount}',
+                                             style: const TextStyle(
+                                               color: Colors.grey,
+                                             ),
+                                           ),
+                                       ],
+                                     ),
+                                   );
+                                 },
+                               ),
+                             );
+                           }).toList(),
+                           onChanged: (value){},
+                         ),
+                       ),
+                     ),
+                   ),
+                   ///Sort Dropdown menu
+                   Padding(
+                     padding: const EdgeInsets.all(5.0),
+                     child: Container(
+                       width: 110,
+                       alignment: Alignment.center,
+                       decoration: BoxDecoration(
+                         border: Border.all(color: Colors.grey, width: 1),
+                         borderRadius: BorderRadius.circular(6.0),
+                       ),
+                       child: DropdownButtonHideUnderline(
+                         child: DropdownButton<String>(
+                           isExpanded: false,
+                           menuWidth: 110,
+                           alignment: Alignment.center,
+                           value: cubit.sortChoice,
+                           hint: const Text('Sort by'),
+                           icon: const Icon(Icons.keyboard_arrow_down),
+                           items: sortPreference.map((String items) {
+                             return DropdownMenuItem(
+                               value: items,
+                               child: Text(items),
+                             );
+                           }).toList(),
+                           onChanged: (value) {
+                             cubit.sortChoice = value;
+                             cubit.sortData(preference: value);
+                           },
+                           style: TextStyle(
+                             color: Colors.grey[600],
+                             fontSize: 16,
+                             fontWeight: FontWeight.w500
+                           ),
+                           borderRadius: BorderRadius.circular(10.0),
+                         ),
+                       ),
+                     ),
+                   ),
+                   ///Search Container
+                   Expanded(
+                     child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey, width: 1),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: TextFormField(
+                            controller: cubit.logSearchController,
+                            onTap: (){
+                              setState(() {
+                                cubit.isSearchPressed = true; //set the list to be all logs to start search in it
+                              });
+                            },
+                            onChanged: (query){
+                              cubit.isSearchPressed = true;
+                              cubit.searchLogString = query;
+                              cubit.searchInLogs();
+                            },
+                            textAlignVertical: TextAlignVertical.top,
+                            decoration: InputDecoration(
+                              hintText: 'Search',
+                              hintStyle: TextStyle(
+                                color: Colors.grey[500],
+                              ),
+                              prefixIcon: Icon(Icons.search, color: Colors.grey[600],),
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    cubit.isSearchPressed = false;
+                                    cubit.logSearchController.clear();
+                                  });
+                                },
+                                icon: const Icon(Icons.close,),
+                                iconSize: 17,
+                              ),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                   ),
+                  ],
+               ),
+             ),
+             ///Row for table categories
+             Container(
+               height: 40,
+               color: HexColor('#e9e9f5'),
+               padding: const EdgeInsets.symmetric(horizontal: 16.0),
+               child: Row(
+                 children: [
+                   Container(
+                     width: 80,
+                     child: Text('Level',
+                       style: TextStyle(
+                         color: Colors.grey[600],
+                         fontWeight: FontWeight.w500,
+                       ),
+                     ),
+                   ),
+                   const SizedBox(width: 12,),
+                   Container(
+                     width: 165,
+                     child: Text('Time',
+                       style: TextStyle(
+                         color: Colors.grey[600],
+                         fontWeight: FontWeight.w500,
+                       ),
+                     ),
+                   ),
+                   const SizedBox(width: 12,),
+                   Expanded(
+                      child: Text('Message',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+               ),
+             ),
+             const SizedBox(height: 5,),
+             ///Logs ListView
+             Expanded(
+               child: ((){
+                 if(state is !TripSearchFailedState){
+                   return ListView.separated(
+                     shrinkWrap: true,
+                     itemBuilder: (context, index) {
+                       if(cubit.isSearchPressed){
+                         return defaultLogsViewer(
+                           logState: cubit.searchedLogs[index]['state'],
+                           logDate: cubit.searchedLogs[index]['date'],
+                           logData: cubit.searchedLogs[index]['log'],
+                         );
+                       } else {
+                         return defaultLogsViewer(
+                           logState: cubit.filteredLogs[index]['state'],
+                           logDate: cubit.filteredLogs[index]['date'],
+                           logData: cubit.filteredLogs[index]['log'],
+                         );
+                       }
+                     },
+                     separatorBuilder: (context, index) => const Divider(),
+                     itemCount: cubit.isSearchPressed? cubit.searchedLogs.length : cubit.filteredLogs.length,
+                   );
+                 } else {
+                   return const Center(child: Text('Trip Not Found !!',
+                     style: TextStyle(
+                       fontSize: 25,
+                       fontWeight: FontWeight.bold,
+                       color: Colors.red,
+                     ),
+                   ));
+                 }
+               })(),
+             )
+           ],
+         ),
+          /*child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              ///Title Row for logs
               Padding(
                 padding: const EdgeInsets.only(left: 16.0, bottom: 10, right: 16),
                 child: Row(
@@ -31,7 +327,26 @@ class LogsScreen extends StatelessWidget {
                     Text('Logs',
                       style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                     ),
-                    const Spacer(),
+                    Spacer(),
+                    Expanded(
+                      child: SearchBarAnimation(
+                        textEditingController: cubit.logSearchController,
+                        isOriginalAnimation: false,
+                        searchBoxWidth: 450,
+                        isSearchBoxOnRightSide: true,
+                        buttonWidget: const Icon(Icons.search),
+                        trailingWidget: const Icon(Icons.search, color: Colors.grey,),
+                        secondaryButtonWidget: const Icon(Icons.close),
+                        onPressButton: (e){
+                            cubit.logSearchController.clear();
+                            //print('search is opened');
+                        },
+                        onChanged: (query){
+                          cubit.searchInLogs(query);
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 16,),
                     const Text(
                       'Sort: ',
                       style: TextStyle(
@@ -72,6 +387,7 @@ class LogsScreen extends StatelessWidget {
                   ],
                 ),
               ),
+              ///Logs ListView
               Expanded(
                 child: ListView.separated(
                   shrinkWrap: true,
@@ -88,7 +404,7 @@ class LogsScreen extends StatelessWidget {
                 ),
               ),
             ],
-          ),
+          ),*/
         );
       },
     );

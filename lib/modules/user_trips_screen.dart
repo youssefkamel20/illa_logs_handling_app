@@ -48,7 +48,7 @@ class UserTripsScreen extends StatelessWidget {
                   Expanded(
                     child: (() {
                       if(cubit.searchUserId == ''){
-                        return Container(
+                        return SizedBox(
                           height: 250,
                           child: Center(
                               child: Text('Please Enter User ID',
@@ -69,7 +69,6 @@ class UserTripsScreen extends StatelessWidget {
                                 cubit.userTripController.text = cubit.allTripsSearchData[index];
                                 cubit.getUserTripLogs(index);
                                 cubit.toggleLogView();
-                                print(cubit.isLogsShowen);
                               },
                               child: defaultUserTripsViewer(
                                 logID: cubit.allTripsSearchData[index],
@@ -86,7 +85,7 @@ class UserTripsScreen extends StatelessWidget {
                               color: Colors.white,
                             ),));
                         }
-                      } else {
+                      } else{
                         return const Center(child: Text('User Id Not Found',
                           style: TextStyle(
                             fontSize: 25,

@@ -27,7 +27,7 @@ class _UserLayoutState extends State<UserLayout> {
     }
 
     return BlocProvider(
-      create: (BuildContext context) => UserCubit()..initWebView()..fetchAllData(),
+      create: (BuildContext context) => UserCubit()..initWebView()..filterData()..searchInLogs(),
       child: BlocConsumer<UserCubit, UserStates>(
         listener: (context, state) {},
         builder: (context, state) {
@@ -36,12 +36,17 @@ class _UserLayoutState extends State<UserLayout> {
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
+              toolbarHeight: 65,
+              backgroundColor: Colors.white,
+              elevation: 0,
+              ///back button or illa logo toggle
               leading: Padding(
                 padding: const EdgeInsets.only(left: 10.0, top: 13),
                 child: cubit.isLogsShowen
                     ? IconButton(
                   onPressed: () {
                     cubit.toggleLogView();
+                    cubit.selectedOptions.clear();
                   },
                   icon: const Icon(Icons.arrow_back_ios_rounded, size: 18,),)
                     : Image.asset(
@@ -58,6 +63,8 @@ class _UserLayoutState extends State<UserLayout> {
                       onSubmit: (query){
                         cubit.searchUserId = query;
                         cubit.searchForUserTrips(query);
+                        cubit.isLogsShowen = false;
+                        cubit.userTripController.clear();
                       }
                   ),
                   Spacer(),
@@ -65,6 +72,9 @@ class _UserLayoutState extends State<UserLayout> {
                       titleText: 'Trip ID',
                       controller: cubit.userTripController,
                       onSubmit: (query){
+                        cubit.statesErrorCount = 0;
+                        cubit.statesWarningCount = 0;
+                        cubit.statesInfoCount = 0;
                         cubit.getSpecificTrip(query);
                         cubit.toggleLogView();
                         cubit.isLogsShowen = true;
@@ -72,8 +82,6 @@ class _UserLayoutState extends State<UserLayout> {
                   ),
                 ],
               ),
-              toolbarHeight: 65,
-              backgroundColor: Colors.white,
             ),
             body: Stack(
               children: [
@@ -113,7 +121,7 @@ class _UserLayoutState extends State<UserLayout> {
                       clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
                           color: Colors.grey[700],
-                          borderRadius: BorderRadius.circular(17.0),
+                          borderRadius: BorderRadius.circular(10.0),
                           border: Border.all(color: Colors.grey, width: 2)
                       ),
                       child: Row(
@@ -122,7 +130,7 @@ class _UserLayoutState extends State<UserLayout> {
                           Expanded(
                             child: ConstrainedBox(
                               constraints: BoxConstraints(
-                                minWidth: 300,
+                                minWidth: 370,
                               ),
                               child: Container(
                                 width: logsWidth,
@@ -133,12 +141,13 @@ class _UserLayoutState extends State<UserLayout> {
                           ///geoJson area
                           if (cubit.isWebShowen) Row(
                             children: [
+                              ///Separator Drag
                               GestureDetector(
                                 behavior: HitTestBehavior.translucent,
                                 onHorizontalDragUpdate: (details) {
                                   setState(() {
                                     // Add boundary conditions for resizing
-                                    if (logsWidth + details.delta.dx > 300 &&  webWidth - details.delta.dx > 100) {
+                                    if (logsWidth + details.delta.dx > 370 &&  webWidth - details.delta.dx > 100) {
                                       logsWidth += details.delta.dx;
                                       webWidth -= details.delta.dx;
                                     }
@@ -147,18 +156,19 @@ class _UserLayoutState extends State<UserLayout> {
                                 child: MouseRegion(
                                   cursor: SystemMouseCursors.resizeColumn,
                                   child: Container(
-                                    width: 4,
+                                    width: 5,
                                     color: Colors.grey[800],
                                     child: Center(
                                       child: Container(
                                         height: double.infinity,
-                                        width: 2,
+                                        width: 4,
                                         color: Colors.grey[900], // Thin line in the center like Excel
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
+                              ///WebView
                               Stack(
                                 alignment: Alignment.topRight,
                                 children: [
@@ -166,7 +176,7 @@ class _UserLayoutState extends State<UserLayout> {
                                     width: webWidth,
                                     clipBehavior: Clip.antiAlias,
                                     decoration: const BoxDecoration(
-                                      borderRadius: BorderRadius.horizontal(right: Radius.circular(15),),
+                                      borderRadius: BorderRadius.horizontal(right: Radius.circular(8),),
                                     ),
                                     child: ConditionalBuilder(
                                       condition: state is! UserMapLoadingState,
@@ -202,8 +212,8 @@ class _UserLayoutState extends State<UserLayout> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('GeoJson' , style: TextStyle(fontWeight: FontWeight.bold),),
-                                    Icon(Icons.keyboard_arrow_up_outlined, ),
+                                    Text('GeoJson' , style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+                                    Icon(Icons.keyboard_arrow_up_outlined, color: Colors.white,),
                                   ],
                                 ),
                               ),

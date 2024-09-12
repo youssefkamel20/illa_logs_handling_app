@@ -22,10 +22,19 @@ class UserSearchLoadingState extends UserStates{}
 class UserSearchSuccessState extends UserStates{}
 class UserSearchFailedState extends UserStates{}
 
+  ///Trip Search States
+class TripSearchLoadingState extends UserStates{}
+class TripSearchSuccessState extends UserStates{}
+class TripSearchFailedState extends UserStates{}
+
   /// Logs Update States
 class UserLogsUpdateLoadingState extends UserStates{}
 class UserLogsUpdateSuccessState extends UserStates{}
 class UserLogsUpdateFailedState extends UserStates{}
+
+/// Logs Update States
+class LogsFilterUpdateState extends UserStates{}
+class LogsFilterFailedState extends UserStates{}
 
   /// Toggle view States
 class UserLogsViewUpdateState extends UserStates{}
