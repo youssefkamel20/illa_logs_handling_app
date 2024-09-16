@@ -9,6 +9,8 @@ import 'package:illa_logs_app/shared/components/components.dart';
 import '../modules/logs_screen.dart';
 
 class UserLayout extends StatefulWidget {
+  const UserLayout({super.key});
+
 
   @override
   State<UserLayout> createState() => _UserLayoutState();
@@ -67,7 +69,7 @@ class _UserLayoutState extends State<UserLayout> {
                         cubit.userTripController.clear();
                       }
                   ),
-                  Spacer(),
+                  const Spacer(),
                   defaultFormField(
                       titleText: 'Trip ID',
                       controller: cubit.userTripController,
@@ -129,10 +131,10 @@ class _UserLayoutState extends State<UserLayout> {
                           ///logs presenting area
                           Expanded(
                             child: ConstrainedBox(
-                              constraints: BoxConstraints(
+                              constraints: const BoxConstraints(
                                 minWidth: 370,
                               ),
-                              child: Container(
+                              child: SizedBox(
                                 width: logsWidth,
                                 child: LogsScreen(),
                               ),
@@ -189,7 +191,7 @@ class _UserLayoutState extends State<UserLayout> {
                                     onPressed: () {
                                       cubit.toggleWebView();
                                     },
-                                    icon: Icon(Icons.close,
+                                    icon: const Icon(Icons.close,
                                     ),
                                     color: Colors.white,
                                   ),

@@ -62,28 +62,32 @@ class UserTripsScreen extends StatelessWidget {
                         );
                         }
                       if (state is !UserSearchFailedState) {
-                        if (cubit.allTripsSearchData.isNotEmpty) {
-                          return ListView.separated(
-                            itemBuilder: (context, index) => MaterialButton(
-                              onPressed: () {
-                                cubit.userTripController.text = cubit.allTripsSearchData[index];
-                                cubit.getUserTripLogs(index);
-                                cubit.toggleLogView();
-                              },
-                              child: defaultUserTripsViewer(
-                                logID: cubit.allTripsSearchData[index],
+                        if(state is !UserSearchLoadingState){
+                          if (cubit.allTripsSearchData.isNotEmpty) {
+                            return ListView.separated(
+                              itemBuilder: (context, index) => MaterialButton(
+                                onPressed: () {
+                                  cubit.userTripController.text = cubit.allTripsSearchData[index];
+                                  cubit.getUserTripLogs(index);
+                                  cubit.toggleLogView();
+                                },
+                                child: defaultUserTripsViewer(
+                                  logID: cubit.allTripsSearchData[index],
+                                ),
                               ),
-                            ),
-                            separatorBuilder: (context, index) => const SizedBox(height: 5,),
-                            itemCount: cubit.allTripsSearchData.length,
-                          );
+                              separatorBuilder: (context, index) => const SizedBox(height: 5,),
+                              itemCount: cubit.allTripsSearchData.length,
+                            );
+                          } else {
+                            return const Center(child: Text('No Trips Available',
+                              style: TextStyle(
+                                fontSize: 25,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),));
+                          }
                         } else {
-                          return const Center(child: Text('No Trips Available',
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),));
+                          return const Center(child: CircularProgressIndicator());
                         }
                       } else{
                         return const Center(child: Text('User Id Not Found',

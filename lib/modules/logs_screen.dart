@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -221,7 +220,7 @@ class _LogsScreenState extends State<LogsScreen> {
                                 color: Colors.grey[500],
                               ),
                               prefixIcon: Icon(Icons.search, color: Colors.grey[600],),
-                              suffixIcon: IconButton(
+                              suffix: IconButton(
                                 onPressed: () {
                                   setState(() {
                                     cubit.isSearchPressed = false;
@@ -282,38 +281,45 @@ class _LogsScreenState extends State<LogsScreen> {
              ///Logs ListView
              Expanded(
                child: ((){
-                 if(state is !TripSearchFailedState){
+                 if(state is TripSearchLoadingState){
+                   return const Center(child: CircularProgressIndicator());
+                 }
+                 if (state is !TripSearchFailedState) {
                    return ListView.separated(
-                     shrinkWrap: true,
-                     itemBuilder: (context, index) {
-                       if(cubit.isSearchPressed){
-                         return defaultLogsViewer(
-                           logState: cubit.searchedLogs[index]['state'],
-                           logDate: cubit.searchedLogs[index]['date'],
-                           logData: cubit.searchedLogs[index]['log'],
-                         );
-                       } else {
-                         return defaultLogsViewer(
-                           logState: cubit.filteredLogs[index]['state'],
-                           logDate: cubit.filteredLogs[index]['date'],
-                           logData: cubit.filteredLogs[index]['log'],
-                         );
-                       }
-                     },
-                     separatorBuilder: (context, index) => const Divider(),
-                     itemCount: cubit.isSearchPressed? cubit.searchedLogs.length : cubit.filteredLogs.length,
-                   );
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        if (cubit.isSearchPressed) {
+                          return defaultLogsViewer(
+                            logState: cubit.searchedLogs[index]['state'],
+                            logDate: cubit.searchedLogs[index]['date'],
+                            logData: cubit.searchedLogs[index]['log'],
+                          );
+                        } else {
+                          return defaultLogsViewer(
+                            logState: cubit.filteredLogs[index]['state'],
+                            logDate: cubit.filteredLogs[index]['date'],
+                            logData: cubit.filteredLogs[index]['log'],
+                          );
+                        }
+                      },
+                      separatorBuilder: (context, index) => const Divider(),
+                      itemCount: cubit.isSearchPressed
+                          ? cubit.searchedLogs.length
+                          : cubit.filteredLogs.length,
+                    );
                  } else {
-                   return const Center(child: Text('Trip Not Found !!',
-                     style: TextStyle(
-                       fontSize: 25,
-                       fontWeight: FontWeight.bold,
-                       color: Colors.red,
-                     ),
-                   ));
+                   return const Center(
+                        child: Text(
+                      'Trip Not Found !!',
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ));
                  }
                })(),
-             )
+              )
            ],
          ),
         );
