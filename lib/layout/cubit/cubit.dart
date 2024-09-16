@@ -62,7 +62,6 @@ class UserCubit extends Cubit<UserStates>{
   var searchUserId = '';
   var searchLogString = '';
   String errorMessage = '';
-  bool errorOccurred = false;
   bool isSearchPressed = false;
   int statesErrorCount = 0;
   int statesWarningCount = 0;
@@ -96,6 +95,7 @@ class UserCubit extends Cubit<UserStates>{
   Future getSpecificTrip(String tripID) async{
     emit(TripSearchLoadingState());
     try {
+      logs.clear();
       final users = await FirebaseFirestore.instance.collection('users').get();
       for(var user in users.docs){
         final trip = await FirebaseFirestore.instance
@@ -108,7 +108,6 @@ class UserCubit extends Cubit<UserStates>{
           searchUserId = user.id;
           userIdController.text = user.id;
           searchForUserTrips(user.id);
-          logs.clear();
 
           final logValues = trip.data()!['logs'] as Map<String, dynamic>;
 
@@ -122,9 +121,13 @@ class UserCubit extends Cubit<UserStates>{
           break;
         }
         else{
-          emit(TripSearchFailedState());
+          emit(TripSearchLoadingState());
         }
       }
+      if(logs.isEmpty){
+        emit(TripSearchFailedState());
+      }
+
       ///Count log States
       logs.forEach((log) {
         if(log['state'] == 'E'){
