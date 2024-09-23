@@ -7,11 +7,12 @@ class UserMapLoadingState extends UserStates{}
 class UserMapSuccessState extends UserStates{}
 class UserMapFailedState extends UserStates{}
 
-
-  ///Logs Loading States
+  ///Logs Realtime Update States
 class UserLogsLoadingState extends UserStates{}
 class UserLogsSuccessState extends UserStates{}
 class UserLogsFailedState extends UserStates{}
+class LogsRealtimeUpdateStoppedState extends UserStates{}
+class LogsRealtimeUpdateResumedState extends UserStates{}
 
   ///Logs sorting States
 class UserLogsSortByStatesState extends UserStates{}
@@ -27,15 +28,15 @@ class TripSearchLoadingState extends UserStates{}
 class TripSearchSuccessState extends UserStates{}
 class TripSearchFailedState extends UserStates{}
 
-  /// Logs Update States
+  ///From User Logs Update to Log Viewer States
 class UserLogsUpdateLoadingState extends UserStates{}
 class UserLogsUpdateSuccessState extends UserStates{}
 class UserLogsUpdateFailedState extends UserStates{}
 
-/// Logs Update States
+  ///Logs Filter Update States
 class LogsFilterUpdateState extends UserStates{}
 class LogsFilterFailedState extends UserStates{}
 
-  /// Toggle view States
+  ///Toggle view States
 class UserLogsViewUpdateState extends UserStates{}
 class UserWebViewUpdateState extends UserStates{}

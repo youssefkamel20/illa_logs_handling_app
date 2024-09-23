@@ -27,7 +27,6 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Illa logs Handling',
-      themeMode: ThemeMode.dark,
       home: UserLayout(),
     );
   }

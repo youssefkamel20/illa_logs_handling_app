@@ -69,7 +69,7 @@ Widget defaultLogsViewer({
         const SizedBox(width: 10,),
         Container(
           width: 170,
-          child: Text('$logDate'),
+          child: SelectableText('$logDate'),
         ),
         const SizedBox(width: 12,),
             Expanded(

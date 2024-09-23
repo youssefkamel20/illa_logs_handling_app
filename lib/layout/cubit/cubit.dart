@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,6 +15,9 @@ class UserCubit extends Cubit<UserStates>{
   var userIdController = TextEditingController();
   var userTripController = TextEditingController();
   TextEditingController logSearchController = TextEditingController();
+  List<Map<String, String>> logs =[];
+  List<Map<String, String>> searchedLogs = [];
+  List<Map<String, String>> filteredLogs = [];
   late WebviewController _controller;
   late Webview webview;
   Future<void> initWebView() async {
@@ -52,12 +57,6 @@ class UserCubit extends Cubit<UserStates>{
     return _result;
   }
 
-///firestore fetch data
-  List<Map<String, String>> logs =[];
-  List<Map<String, String>> searchedLogs = [];
-  List<Map<String, String>> filteredLogs = [];
-
-
 ///Search
   var searchUserId = '';
   var searchLogString = '';
@@ -66,10 +65,10 @@ class UserCubit extends Cubit<UserStates>{
   int statesErrorCount = 0;
   int statesWarningCount = 0;
   int statesInfoCount = 0;
-  List<String> allTripsSearchData = [];
+  List<String> allUserTripsIDs = [];
   //Search for UserTrips
   searchForUserTrips(String path) async{
-    allTripsSearchData.clear();
+    allUserTripsIDs.clear();
     emit(UserSearchLoadingState());
     try {
       ///get user trips info
@@ -78,7 +77,7 @@ class UserCubit extends Cubit<UserStates>{
       if (user.exists){
         final trips = await FirebaseFirestore.instance.collection('users').doc(path).collection('trips-logs').get();
         for(var trip in trips.docs) { // accessing each trip doc
-          allTripsSearchData.add(trip.id); // add main info of each trip to a list
+          allUserTripsIDs.add(trip.id); // add main info of each trip to a list
         }
         emit(UserSearchSuccessState());
       }
@@ -168,7 +167,7 @@ class UserCubit extends Cubit<UserStates>{
     statesInfoCount = 0;
     emit(UserLogsUpdateLoadingState());
     logs.clear();
-    final tripLogPath = allTripsSearchData[index];
+    final tripLogPath = allUserTripsIDs[index];
     try{
       final response = await FirebaseFirestore.instance
           .collection('users')
@@ -203,7 +202,68 @@ class UserCubit extends Cubit<UserStates>{
   }
 
 
-///Sort Logs
+///Realtime Database Update
+  bool isUpdateStopped = true;
+  StreamSubscription? _streamSubscription;
+  updateDatabase() {
+    if(_streamSubscription != null) {
+      _streamSubscription!.cancel();
+    }
+    if(isUpdateStopped == true) return ; //Break Function unless it is called
+
+      emit(UserLogsLoadingState());
+    _streamSubscription = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userIdController.text)
+        .collection('trips-logs')
+        .doc(userTripController.text)
+        .snapshots()
+        .listen((snapshot) {
+      int statesErrorCount = 0;
+      int statesWarningCount = 0;
+      int statesInfoCount = 0;
+      logs.clear();
+      final data = snapshot.data()!['logs'] as Map<String, dynamic>;
+      try {
+        for (var logData in data.entries) {
+          final logIndex = _logIndexExtractor(logData.value);
+          final logValue = _logDataExtractor(logData.value);
+          final logDate = logData.key;
+          logs.add({'log': logValue, 'state': logIndex, 'date': logDate});
+        }
+
+        ///Count log States
+        logs.forEach((log) {
+          if (log['state'] == 'E') {
+            statesErrorCount++;
+          }
+          else if (log['state'] == 'W') {
+            statesWarningCount++;
+          }
+          else if (log['state'] == 'I') {
+            statesInfoCount++;
+          }
+        });
+
+        emit(UserLogsSuccessState());
+      } catch (e) {
+        emit(UserLogsFailedState());
+        print('Error while realtime data update: $e');
+      }
+    });
+  }
+  stopUpdateDatabase(){
+    isUpdateStopped = true;
+    _streamSubscription?.cancel();
+    emit(LogsRealtimeUpdateStoppedState());
+  }
+  resumeUpdateDatabase(){
+    isUpdateStopped = false;
+    updateDatabase();
+    emit(LogsRealtimeUpdateResumedState());
+  }
+
+  ///Sort Logs
   var sortChoice;
   sortData({var preference = 'by log'}) {
     if(preference == 'level'){
@@ -252,6 +312,7 @@ class UserCubit extends Cubit<UserStates>{
       print(error.toString());
     }
   }
+
 
 
 ///Toggle

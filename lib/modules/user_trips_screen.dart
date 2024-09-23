@@ -63,20 +63,20 @@ class UserTripsScreen extends StatelessWidget {
                         }
                       if (state is !UserSearchFailedState) {
                         if(state is !UserSearchLoadingState){
-                          if (cubit.allTripsSearchData.isNotEmpty) {
+                          if (cubit.allUserTripsIDs.isNotEmpty) {
                             return ListView.separated(
                               itemBuilder: (context, index) => MaterialButton(
                                 onPressed: () {
-                                  cubit.userTripController.text = cubit.allTripsSearchData[index];
+                                  cubit.userTripController.text = cubit.allUserTripsIDs[index];
                                   cubit.getUserTripLogs(index);
                                   cubit.toggleLogView();
                                 },
                                 child: defaultUserTripsViewer(
-                                  logID: cubit.allTripsSearchData[index],
+                                  logID: cubit.allUserTripsIDs[index],
                                 ),
                               ),
                               separatorBuilder: (context, index) => const SizedBox(height: 5,),
-                              itemCount: cubit.allTripsSearchData.length,
+                              itemCount: cubit.allUserTripsIDs.length,
                             );
                           } else {
                             return const Center(child: Text('No Trips Available',

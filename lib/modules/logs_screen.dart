@@ -46,13 +46,59 @@ class _LogsScreenState extends State<LogsScreen> {
                alignment: Alignment.centerLeft,
                child: Padding(
                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                 child: Text('Logs',
-                   textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[600],
-                    ),
+                 child: Row(
+                   children: [
+                     Text('Logs',
+                       textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                     const Spacer(),
+                     const Text('Realtime Update'),
+                     const SizedBox(width: 10,),
+                     GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (cubit.isUpdateStopped) {
+                              cubit.resumeUpdateDatabase();
+                            }
+                            else {
+                              cubit.stopUpdateDatabase();
+                            }
+                          });
+                        },
+                        child: Stack(
+                         children: [
+                           Container(
+                             width: 44,
+                             height: 25,
+                             decoration: BoxDecoration(
+                               color: cubit.isUpdateStopped ? Colors.red : Colors.green , // Color change
+                               borderRadius: BorderRadius.circular(50.0),
+                             ),
+                           ),
+                           AnimatedPositioned(
+                             duration: const Duration(milliseconds: 300),
+                             curve: Curves.easeInCubic,
+                             left: cubit.isUpdateStopped ? 2 : 21,
+                             top: 2,
+                             child: Container(
+                               width: 21.0,
+                               height: 21.0,
+                               decoration: BoxDecoration(
+                                 shape: BoxShape.circle,
+                                 color: Colors.white,
+                                 border: Border.all(color: Colors.black54, width: 2),
+                               ),
+                             ),
+                           ),
+                         ],
+                       ),
+                     )
+                   ],
                   ),
                ),
              ),

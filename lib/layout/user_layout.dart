@@ -46,11 +46,16 @@ class _UserLayoutState extends State<UserLayout> {
                 padding: const EdgeInsets.only(left: 10.0, top: 13),
                 child: cubit.isLogsShowen
                     ? IconButton(
-                  onPressed: () {
-                    cubit.toggleLogView();
-                    cubit.selectedOptions.clear();
-                  },
-                  icon: const Icon(Icons.arrow_back_ios_rounded, size: 18,),)
+                        onPressed: () {
+                          cubit.toggleLogView();
+                          cubit.selectedOptions.clear();
+                          cubit.filteredLogs = cubit.logs;
+                        },
+                        icon: const Icon(
+                          Icons.arrow_back_ios_rounded,
+                          size: 18,
+                        ),
+                      )
                     : Image.asset(
                   'images/illaiconpic_png.png',
                   alignment: Alignment.center,
