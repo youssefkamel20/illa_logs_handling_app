@@ -50,6 +50,8 @@ class _UserLayoutState extends State<UserLayout> {
                           cubit.toggleLogView();
                           cubit.selectedOptions.clear();
                           cubit.filteredLogs = cubit.logs;
+                          cubit.isSearchPressed = false;
+                          cubit.logSearchController.clear();
                         },
                         icon: const Icon(
                           Icons.arrow_back_ios_rounded,
