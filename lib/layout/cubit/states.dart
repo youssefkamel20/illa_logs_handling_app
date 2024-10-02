@@ -22,6 +22,7 @@ class UserLogsSortByLogsState extends UserStates{}
 class UserSearchLoadingState extends UserStates{}
 class UserSearchSuccessState extends UserStates{}
 class UserSearchFailedState extends UserStates{}
+class UserSearchTripsNotFoundState extends UserStates{}
 
   ///Trip Search States
 class TripSearchLoadingState extends UserStates{}

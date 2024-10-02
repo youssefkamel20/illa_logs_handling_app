@@ -330,39 +330,39 @@ class _LogsScreenState extends State<LogsScreen> {
                  if(state is TripSearchLoadingState){
                    return const Center(child: CircularProgressIndicator());
                  }
-                 if (state is !TripSearchFailedState) {
-                   return ListView.separated(
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        if (cubit.isSearchPressed) {
-                          return defaultLogsViewer(
-                            logState: cubit.searchedLogs[index]['state'],
-                            logDate: cubit.searchedLogs[index]['date'],
-                            logData: cubit.searchedLogs[index]['log'],
-                          );
-                        } else {
-                          return defaultLogsViewer(
-                            logState: cubit.filteredLogs[index]['state'],
-                            logDate: cubit.filteredLogs[index]['date'],
-                            logData: cubit.filteredLogs[index]['log'],
-                          );
-                        }
-                      },
-                      separatorBuilder: (context, index) => const Divider(),
-                      itemCount: cubit.isSearchPressed
-                          ? cubit.searchedLogs.length
-                          : cubit.filteredLogs.length,
-                    );
-                 } else {
+                 if (state is TripSearchFailedState) {
                    return const Center(
-                        child: Text(
-                      'Trip Not Found !!',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ));
+                       child: Text(
+                         'Trip Not Found !!',
+                         style: TextStyle(
+                           fontSize: 25,
+                           fontWeight: FontWeight.bold,
+                           color: Colors.red,
+                         ),
+                       ));
+                 } else {
+                   return ListView.separated(
+                     shrinkWrap: true,
+                     itemBuilder: (context, index) {
+                       if (cubit.isSearchPressed) {
+                         return defaultLogsViewer(
+                           logState: cubit.searchedLogs[index]['state'],
+                           logDate: cubit.searchedLogs[index]['date'],
+                           logData: cubit.searchedLogs[index]['log'],
+                         );
+                       } else {
+                         return defaultLogsViewer(
+                           logState: cubit.filteredLogs[index]['state'],
+                           logDate: cubit.filteredLogs[index]['date'],
+                           logData: cubit.filteredLogs[index]['log'],
+                         );
+                       }
+                     },
+                     separatorBuilder: (context, index) => const Divider(),
+                     itemCount: cubit.isSearchPressed
+                         ? cubit.searchedLogs.length
+                         : cubit.filteredLogs.length,
+                   );
                  }
                })(),
               )

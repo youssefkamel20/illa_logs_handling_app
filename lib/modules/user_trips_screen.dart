@@ -63,7 +63,7 @@ class UserTripsScreen extends StatelessWidget {
                         }
                       if (state is !UserSearchFailedState) {
                         if(state is !UserSearchLoadingState){
-                          if (cubit.allUserTripsIDs.isNotEmpty) {
+                          if(state is !UserSearchTripsNotFoundState){
                             return ListView.separated(
                               itemBuilder: (context, index) => MaterialButton(
                                 onPressed: () {
@@ -78,12 +78,12 @@ class UserTripsScreen extends StatelessWidget {
                               separatorBuilder: (context, index) => const SizedBox(height: 5,),
                               itemCount: cubit.allUserTripsIDs.length,
                             );
-                          } else {
+                          } else{
                             return const Center(child: Text('No Trips Available',
                               style: TextStyle(
                                 fontSize: 25,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: Colors.red,
                               ),));
                           }
                         } else {
