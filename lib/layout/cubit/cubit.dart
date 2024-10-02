@@ -76,10 +76,14 @@ class UserCubit extends Cubit<UserStates>{
       ///Check if the user exists
       if (user.exists){
         final trips = await FirebaseFirestore.instance.collection('users').doc(path).collection('trips-logs').get();
-        for(var trip in trips.docs) { // accessing each trip doc
-          allUserTripsIDs.add(trip.id); // add main info of each trip to a list
+        if(trips.size != 0){
+          for(var trip in trips.docs) { // accessing each trip doc
+            allUserTripsIDs.add(trip.id); // add main info of each trip to a list
+          }
+          emit(UserSearchSuccessState());
+        } else {
+          emit(UserSearchTripsNotFoundState());
         }
-        emit(UserSearchSuccessState());
       }
       else{
         emit(UserSearchFailedState());
@@ -205,7 +209,7 @@ class UserCubit extends Cubit<UserStates>{
 ///Realtime Database Update
   bool isUpdateStopped = true;
   StreamSubscription? _streamSubscription;
-  updateDatabase() {
+  void updateDatabase() {
     if(_streamSubscription != null) {
       _streamSubscription!.cancel();
     }
@@ -219,9 +223,9 @@ class UserCubit extends Cubit<UserStates>{
         .doc(userTripController.text)
         .snapshots()
         .listen((snapshot) {
-      int statesErrorCount = 0;
-      int statesWarningCount = 0;
-      int statesInfoCount = 0;
+      statesErrorCount = 0;
+      statesWarningCount = 0;
+      statesInfoCount = 0;
       logs.clear();
       final data = snapshot.data()!['logs'] as Map<String, dynamic>;
       try {
@@ -252,12 +256,12 @@ class UserCubit extends Cubit<UserStates>{
       }
     });
   }
-  stopUpdateDatabase(){
+  void stopUpdateDatabase(){
     isUpdateStopped = true;
     _streamSubscription?.cancel();
     emit(LogsRealtimeUpdateStoppedState());
   }
-  resumeUpdateDatabase(){
+  void resumeUpdateDatabase(){
     isUpdateStopped = false;
     updateDatabase();
     emit(LogsRealtimeUpdateResumedState());
@@ -327,20 +331,5 @@ class UserCubit extends Cubit<UserStates>{
     emit(UserWebViewUpdateState());
   }
 
-
-
-///scroll listener for pagination
-/*  int logslength = 20;
-  final ScrollController scrollController = ScrollController();
-  void scrollListener(){
-    if(scrollController.position.pixels == scrollController.position.maxScrollExtent) {
-      if(logslength < logs.length){
-        logslength = logslength + 20;
-        emit(UserLogsPaginationSuccessState());
-      } else if (logslength == logs.length){
-        return null;
-      }
-    }
-  }*/
 
   }
