@@ -41,7 +41,7 @@ dependencies:
   #State Management
   bloc: ^8.1.4
   flutter_bloc: ^8.1.6
-  window_manager: ^0.4.2
+  bitsdojo_window: ^0.1.6
 
   #firebase
   firebase_core: ^3.4.0

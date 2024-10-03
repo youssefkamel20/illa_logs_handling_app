@@ -1,4 +1,5 @@
 
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,8 +25,10 @@ class _UserLayoutState extends State<UserLayout> {
   Widget build(BuildContext context) {
     if (logsWidth == 0 && webWidth == 0) {
       // Initialize widths only once based on screen width
-      logsWidth = MediaQuery.of(context).size.width / 2 - 19;
-      webWidth = MediaQuery.of(context).size.width / 2 - 19;
+      logsWidth = appWindow.size.width /2 -19;
+      webWidth = appWindow.size.width /2 -19;
+      //logsWidth = MediaQuery.of(context).size.width / 2 - 19;
+      //webWidth = MediaQuery.of(context).size.width / 2 - 19;
     }
 
     return BlocProvider(
@@ -38,6 +41,7 @@ class _UserLayoutState extends State<UserLayout> {
           return Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
+              scrolledUnderElevation: 0.0,
               toolbarHeight: 65,
               backgroundColor: Colors.white,
               elevation: 0,
