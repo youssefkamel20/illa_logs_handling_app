@@ -13,7 +13,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   doWhenWindowReady((){
-    appWindow.size = const Size(720.0, 480.0);
+    //appWindow.size = const Size(720.0, 480.0);
     appWindow.minSize = const Size(720.0, 480.0);
     appWindow.alignment = Alignment.center;
   });

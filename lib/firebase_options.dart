@@ -53,13 +53,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDAoeiLHWK37bXUZ6rq-T33x7Aj0Oke23o',
-    appId: '1:656296710809:web:fd932313ca59e95bba1e08',
-    messagingSenderId: '656296710809',
-    projectId: 'illa-logs-dummy',
-    authDomain: 'illa-logs-dummy.firebaseapp.com',
-    databaseURL: 'https://illa-logs-dummy-default-rtdb.firebaseio.com',
-    storageBucket: 'illa-logs-dummy.appspot.com',
+    apiKey: 'AIzaSyDdCvlK5_Jqz7ZjVmQ9p7X5-rF-KLiWGYA',
+    appId: '1:598335834102:web:4945cffda72e1fd98c69d7',
+    messagingSenderId: '598335834102',
+    projectId: 'new-driver-app---native',
+    authDomain: 'new-driver-app---native.firebaseapp.com',
+    storageBucket: 'new-driver-app---native.appspot.com',
+    measurementId: 'G-9CGXWE0E8E',
   );
 
 }

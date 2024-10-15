@@ -34,7 +34,17 @@ class UserCubit extends Cubit<UserStates>{
     }
   }
 
-///Log Index Extractor
+///Extractor
+  //UserName Extractor
+  String idExtractor (String realID){
+    final startIndex = realID.indexOf('-');
+    var id = '';
+    if(startIndex != -1){
+      id = realID.substring(startIndex + 1);
+    }
+    return id;
+  }
+  //Log Index Extractor
   String _logIndexExtractor (String logData){
     final startIndex = logData.indexOf('[');
     final endIndex = logData.indexOf(']');
@@ -44,8 +54,7 @@ class UserCubit extends Cubit<UserStates>{
     }
     return index;
   }
-
-///Log Data Extractor
+  //Log Data Extractor
   String _logDataExtractor (String logData){
     var _result = '';
     int index = logData.indexOf('TRIP_LOGGER: ');
@@ -58,7 +67,6 @@ class UserCubit extends Cubit<UserStates>{
   }
 
 ///Search
-  var searchUserId = '';
   var searchLogString = '';
   String errorMessage = '';
   bool isSearchPressed = false;
@@ -72,10 +80,10 @@ class UserCubit extends Cubit<UserStates>{
     emit(UserSearchLoadingState());
     try {
       ///get user trips info
-      final user = await FirebaseFirestore.instance.collection('users').doc(path).get();
+      final user = await FirebaseFirestore.instance.collection('USERS').doc('user-$path').get();
       ///Check if the user exists
       if (user.exists){
-        final trips = await FirebaseFirestore.instance.collection('users').doc(path).collection('trips-logs').get();
+        final trips = await FirebaseFirestore.instance.collection('USERS').doc('user-$path').collection('trips-logs').get();
         if(trips.size != 0){
           for(var trip in trips.docs) { // accessing each trip doc
             allUserTripsIDs.add(trip.id); // add main info of each trip to a list
@@ -96,37 +104,84 @@ class UserCubit extends Cubit<UserStates>{
   }
   //Search for a specific trip
   Future getSpecificTrip(String tripID) async{
-    emit(TripSearchLoadingState());
     try {
       logs.clear();
-      final users = await FirebaseFirestore.instance.collection('users').get();
-      for(var user in users.docs){
-        final trip = await FirebaseFirestore.instance
-            .collection('users')
+      final users = await FirebaseFirestore.instance.collection('USERS').get();
+      emit(TripSearchLoadingState());
+      final futures = users.docs.map((user) async {
+        final tripsSnapshot = await FirebaseFirestore.instance
+            .collection('USERS')
             .doc(user.id)
             .collection('trips-logs')
-            .doc(tripID)
+            .doc('trip-$tripID.log')
             .get();
-        if(trip.exists){
-          searchUserId = user.id;
-          userIdController.text = user.id;
-          searchForUserTrips(user.id);
 
-          final logValues = trip.data()!['logs'] as Map<String, dynamic>;
+        if (tripsSnapshot.exists) {
+          print('Trip found for user: ${user.id}');
+          return {
+            'userID' : user.id,
+            'tripData' : tripsSnapshot.data(),
+          }; // Return trip data if found
+        }
+      }).toList();
 
-          for (var logData in logValues.entries) {
+      final results = await Future.wait(futures);
+      final tripDataMap = results.firstWhere((result) => result != null, orElse: () => null);
+      userIdController.text = idExtractor(tripDataMap!['userID'] as String);
+      searchForUserTrips(idExtractor(tripDataMap['userID'] as String));
+
+      if (tripDataMap != null) {
+        emit(TripSearchLoadingState());
+        final logsData = tripDataMap['tripData']as Map<String, dynamic>;
+
+        final logsValues = logsData['logs'] as List<dynamic>;
+        for(var logsMap in logsValues){
+          final log = logsMap as Map<String, dynamic>;
+          for (var logData in log.entries) {
             final logIndex = _logIndexExtractor(logData.value);
             final logValue = _logDataExtractor(logData.value);
             final logDate = logData.key;
             logs.add({'log': logValue, 'state' : logIndex, 'date' : logDate});
           }
+        }
+        emit(TripSearchSuccessState());
+      } else {
+        emit(TripSearchFailedState());
+        print('Trip not found.');
+      }
+
+      /*for(final user in users.docs){
+        emit(TripSearchLoadingState());
+        print('Fetching in user: ${user.id}');
+        final trip = await FirebaseFirestore.instance
+            .collection('USERS')
+            .doc(user.id)
+            .collection('trips-logs')
+            .doc('trip-$tripID.log')
+            .get();
+        if(trip.exists){
+          print('id is:${_idExtractor(user.id)}');
+          userIdController.text = _idExtractor(user.id);
+          searchForUserTrips(_idExtractor(user.id));
+
+          final logsValues = trip.data()!['logs'] as List<dynamic>;
+          for(var logsMap in logsValues){
+            final log = logsMap as Map<String, dynamic>;
+            for (var logData in log.entries) {
+              final logIndex = _logIndexExtractor(logData.value);
+              final logValue = _logDataExtractor(logData.value);
+              final logDate = logData.key;
+              logs.add({'log': logValue, 'state' : logIndex, 'date' : logDate});
+            }
+          }
           emit(TripSearchSuccessState());
           break;
         }
-        else{
-          emit(TripSearchLoadingState());
-        }
-      }
+      }*/
+
+      //trip-251936.log
+      //trip-255208.log
+
       if(logs.isEmpty){
         emit(TripSearchFailedState());
       }
@@ -174,18 +229,21 @@ class UserCubit extends Cubit<UserStates>{
     final tripLogPath = allUserTripsIDs[index];
     try{
       final response = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(searchUserId)
+          .collection('USERS')
+          .doc('user-${userIdController.text}')
           .collection('trips-logs')
           .doc(tripLogPath)
           .get();
-      final logsValues = response.data()!['logs'] as Map<String, dynamic>;
-        for (var logData in logsValues.entries) {
+      final logsValues = response.data()!['logs'] as List<dynamic>;
+      for(var logsMap in logsValues){
+        final log = logsMap as Map<String, dynamic>;
+        for (var logData in log.entries) {
           final logIndex = _logIndexExtractor(logData.value);
           final logValue = _logDataExtractor(logData.value);
           final logDate = logData.key;
           logs.add({'log': logValue, 'state' : logIndex, 'date' : logDate});
         }
+      }
 
       print('This Trip contains: ${logs.length} log');
       ///Count log States
@@ -217,23 +275,26 @@ class UserCubit extends Cubit<UserStates>{
 
       emit(UserLogsLoadingState());
     _streamSubscription = FirebaseFirestore.instance
-        .collection('users')
-        .doc(userIdController.text)
+        .collection('USERS')
+        .doc('user-${userIdController.text}')
         .collection('trips-logs')
-        .doc(userTripController.text)
+        .doc('trip-${userTripController.text}.log')
         .snapshots()
         .listen((snapshot) {
       statesErrorCount = 0;
       statesWarningCount = 0;
       statesInfoCount = 0;
       logs.clear();
-      final data = snapshot.data()!['logs'] as Map<String, dynamic>;
       try {
-        for (var logData in data.entries) {
-          final logIndex = _logIndexExtractor(logData.value);
-          final logValue = _logDataExtractor(logData.value);
-          final logDate = logData.key;
-          logs.add({'log': logValue, 'state': logIndex, 'date': logDate});
+        final logsValues = snapshot.data()!['logs'] as List<dynamic>;
+        for(var logsMap in logsValues){
+          final log = logsMap as Map<String, dynamic>;
+          for (var logData in log.entries) {
+            final logIndex = _logIndexExtractor(logData.value);
+            final logValue = _logDataExtractor(logData.value);
+            final logDate = logData.key;
+            logs.add({'log': logValue, 'state' : logIndex, 'date' : logDate});
+          }
         }
 
         ///Count log States

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:illa_logs_app/layout/cubit/cubit.dart';
 import 'package:illa_logs_app/layout/cubit/states.dart';
-import '../shared/components/components.dart';
+import '../../shared/components/components.dart';
 
 class UserTripsScreen extends StatelessWidget {
 
@@ -47,7 +47,7 @@ class UserTripsScreen extends StatelessWidget {
                   const SizedBox(height: 10,),
                   Expanded(
                     child: (() {
-                      if(cubit.searchUserId == ''){
+                      if(cubit.userIdController.text.isEmpty){
                         return SizedBox(
                           height: 250,
                           child: Center(
@@ -67,7 +67,16 @@ class UserTripsScreen extends StatelessWidget {
                             return ListView.separated(
                               itemBuilder: (context, index) => MaterialButton(
                                 onPressed: () {
-                                  cubit.userTripController.text = cubit.allUserTripsIDs[index];
+                                  String idExtractor (String tripRealID){
+                                      final startIndex = tripRealID.indexOf('-');
+                                      final endIndex = tripRealID.indexOf('.');
+                                      var id = '';
+                                      if(startIndex != -1 && endIndex != -1 && startIndex< endIndex){
+                                        id = tripRealID.substring(startIndex + 1, endIndex);
+                                      }
+                                      return id;
+                                    }
+                                  cubit.userTripController.text = idExtractor(cubit.allUserTripsIDs[index]);
                                   cubit.getUserTripLogs(index);
                                   cubit.toggleLogView();
                                 },

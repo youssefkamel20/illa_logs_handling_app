@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:illa_logs_app/layout/cubit/cubit.dart';
 import 'package:illa_logs_app/layout/cubit/states.dart';
-import 'package:illa_logs_app/modules/user_trips_screen.dart';
+import 'package:illa_logs_app/modules/user_trips_screen/user_trips_screen.dart';
 import 'package:illa_logs_app/shared/components/components.dart';
-import '../modules/logs_screen.dart';
+import '../modules/logs_screen/logs_screen.dart';
 
 class UserLayout extends StatefulWidget {
   const UserLayout({super.key});
@@ -74,7 +74,6 @@ class _UserLayoutState extends State<UserLayout> {
                       titleText: 'User ID',
                       controller: cubit.userIdController,
                       onSubmit: (query){
-                        cubit.searchUserId = query;
                         cubit.searchForUserTrips(query);
                         cubit.isLogsShowen = false;
                         cubit.userTripController.clear();
