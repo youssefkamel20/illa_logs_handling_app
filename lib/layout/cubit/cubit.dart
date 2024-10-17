@@ -130,6 +130,8 @@ class UserCubit extends Cubit<UserStates>{
       userIdController.text = idExtractor(tripDataMap!['userID'] as String);
       searchForUserTrips(idExtractor(tripDataMap['userID'] as String));
 
+      //2024-09-12 11:32:28343: [I] TRIP_LOGGER:  Trip status Updated arrived]
+
       if (tripDataMap != null) {
         emit(TripSearchLoadingState());
         final logsData = tripDataMap['tripData']as Map<String, dynamic>;
@@ -149,38 +151,6 @@ class UserCubit extends Cubit<UserStates>{
         emit(TripSearchFailedState());
         print('Trip not found.');
       }
-
-      /*for(final user in users.docs){
-        emit(TripSearchLoadingState());
-        print('Fetching in user: ${user.id}');
-        final trip = await FirebaseFirestore.instance
-            .collection('USERS')
-            .doc(user.id)
-            .collection('trips-logs')
-            .doc('trip-$tripID.log')
-            .get();
-        if(trip.exists){
-          print('id is:${_idExtractor(user.id)}');
-          userIdController.text = _idExtractor(user.id);
-          searchForUserTrips(_idExtractor(user.id));
-
-          final logsValues = trip.data()!['logs'] as List<dynamic>;
-          for(var logsMap in logsValues){
-            final log = logsMap as Map<String, dynamic>;
-            for (var logData in log.entries) {
-              final logIndex = _logIndexExtractor(logData.value);
-              final logValue = _logDataExtractor(logData.value);
-              final logDate = logData.key;
-              logs.add({'log': logValue, 'state' : logIndex, 'date' : logDate});
-            }
-          }
-          emit(TripSearchSuccessState());
-          break;
-        }
-      }*/
-
-      //trip-251936.log
-      //trip-255208.log
 
       if(logs.isEmpty){
         emit(TripSearchFailedState());

@@ -80,7 +80,7 @@ class UserTripsScreen extends StatelessWidget {
                                   cubit.getUserTripLogs(index);
                                   cubit.toggleLogView();
                                 },
-                                child: defaultUserTripsViewer(
+                                child: DefaultUserTripsViewer(
                                   logID: cubit.allUserTripsIDs[index],
                                 ),
                               ),

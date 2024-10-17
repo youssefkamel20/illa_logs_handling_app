@@ -3,10 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:illa_logs_app/layout/cubit/cubit.dart';
 import 'package:illa_logs_app/layout/cubit/states.dart';
-import 'package:illa_logs_app/modules/logs_screen/utilities/dropdown_menus.dart';
+import 'package:illa_logs_app/modules/logs_layout/screens/webView.dart';
+import 'package:illa_logs_app/modules/logs_layout/utilities/dropdown_menus.dart';
 import 'package:illa_logs_app/shared/components/components.dart';
 
 class LogsScreen extends StatefulWidget {
+  const LogsScreen({super.key});
+
   @override
   State<LogsScreen> createState() => _LogsScreenState();
 }
@@ -18,7 +21,6 @@ class _LogsScreenState extends State<LogsScreen> {
     'Info',
     'Warning'
   ];
-  var selectedChoice;
   var sortPreference =[
     'level',
     'date',
@@ -32,6 +34,7 @@ class _LogsScreenState extends State<LogsScreen> {
         var cubit = UserCubit.get(context);
 
         return Container(
+          width: logsWidth,
           clipBehavior: Clip.antiAlias,
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -57,6 +60,9 @@ class _LogsScreenState extends State<LogsScreen> {
                           color: Colors.grey[600],
                         ),
                       ),
+                     const SizedBox(
+                       width: 30,
+                     ),
                      const Spacer(),
                      const Text('Realtime Update'),
                      const SizedBox(width: 10,),
@@ -203,7 +209,7 @@ class _LogsScreenState extends State<LogsScreen> {
                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                child: Row(
                  children: [
-                   Container(
+                   SizedBox(
                      width: 80,
                      child: Text('Level',
                        style: TextStyle(
@@ -213,7 +219,7 @@ class _LogsScreenState extends State<LogsScreen> {
                      ),
                    ),
                    const SizedBox(width: 12,),
-                   Container(
+                   SizedBox(
                      width: 165,
                      child: Text('Time',
                        style: TextStyle(
@@ -256,16 +262,16 @@ class _LogsScreenState extends State<LogsScreen> {
                      shrinkWrap: true,
                      itemBuilder: (context, index) {
                        if (cubit.isSearchPressed) {
-                         return defaultLogsViewer(
-                           logState: cubit.searchedLogs[index]['state'],
-                           logDate: cubit.searchedLogs[index]['date'],
-                           logData: cubit.searchedLogs[index]['log'],
+                         return DefaultLogsViewer(
+                           logState: cubit.searchedLogs[index]['state'] as String,
+                           logDate: cubit.searchedLogs[index]['date'] as String,
+                           logData: cubit.searchedLogs[index]['log'] as String,
                          );
                        } else {
-                         return defaultLogsViewer(
-                           logState: cubit.filteredLogs[index]['state'],
-                           logDate: cubit.filteredLogs[index]['date'],
-                           logData: cubit.filteredLogs[index]['log'],
+                         return DefaultLogsViewer(
+                           logState: cubit.filteredLogs[index]['state'] as String,
+                           logDate: cubit.filteredLogs[index]['date'] as String,
+                           logData: cubit.filteredLogs[index]['log'] as String,
                          );
                        }
                      },
