@@ -3,8 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/cubit/states.dart';
-import 'package:webview_windows/webview_windows.dart';
+import 'package:illa_logs_app/layout/user_cubit/user_states.dart';
 
 
 class UserCubit extends Cubit<UserStates>{
@@ -18,21 +17,6 @@ class UserCubit extends Cubit<UserStates>{
   List<Map<String, String>> logs =[];
   List<Map<String, String>> searchedLogs = [];
   List<Map<String, String>> filteredLogs = [];
-  late WebviewController _controller;
-  late Webview webview;
-  Future<void> initWebView() async {
-    emit(UserMapLoadingState());
-    _controller = WebviewController();
-    webview = Webview(_controller);
-    try {
-      await _controller.initialize();
-      _controller.loadUrl('https://geojson.io/#map=2/0/20');
-      emit(UserMapSuccessState());
-    } catch (error) {
-      print(error.toString());
-      emit(UserMapFailedState());
-    }
-  }
 
 ///Extractor
   //UserName Extractor
@@ -73,9 +57,9 @@ class UserCubit extends Cubit<UserStates>{
   int statesErrorCount = 0;
   int statesWarningCount = 0;
   int statesInfoCount = 0;
-  List<String> allUserTripsIDs = [];
+  //List<String> allUserTripsIDs = [];
   //Search for UserTrips
-  searchForUserTrips(String path) async{
+  /*searchForUserTrips(String path) async{
     allUserTripsIDs.clear();
     emit(UserSearchLoadingState());
     try {
@@ -101,7 +85,7 @@ class UserCubit extends Cubit<UserStates>{
       emit(UserSearchFailedState());
       print(error.toString());
     }
-  }
+  }*/
   //Search for a specific trip
   Future getSpecificTrip(String tripID) async{
     try {
@@ -128,7 +112,7 @@ class UserCubit extends Cubit<UserStates>{
       final results = await Future.wait(futures);
       final tripDataMap = results.firstWhere((result) => result != null, orElse: () => null);
       userIdController.text = idExtractor(tripDataMap!['userID'] as String);
-      searchForUserTrips(idExtractor(tripDataMap['userID'] as String));
+      //searchForUserTrips(idExtractor(tripDataMap['userID'] as String));
 
       //2024-09-12 11:32:28343: [I] TRIP_LOGGER:  Trip status Updated arrived]
 
@@ -196,13 +180,13 @@ class UserCubit extends Cubit<UserStates>{
     statesInfoCount = 0;
     emit(UserLogsUpdateLoadingState());
     logs.clear();
-    final tripLogPath = allUserTripsIDs[index];
+    //final tripLogPath = allUserTripsIDs[index];
     try{
       final response = await FirebaseFirestore.instance
           .collection('USERS')
           .doc('user-${userIdController.text}')
           .collection('trips-logs')
-          .doc(tripLogPath)
+          .doc("tripLogPath")
           .get();
       final logsValues = response.data()!['logs'] as List<dynamic>;
       for(var logsMap in logsValues){
@@ -352,14 +336,9 @@ class UserCubit extends Cubit<UserStates>{
 
 ///Toggle
   bool isLogsShowen = false;
-  bool isWebShowen = false;
   toggleLogView (){
     isLogsShowen =! isLogsShowen;
     emit(UserLogsViewUpdateState());
-  }
-  toggleWebView(){
-    isWebShowen =! isWebShowen;
-    emit(UserWebViewUpdateState());
   }
 
 

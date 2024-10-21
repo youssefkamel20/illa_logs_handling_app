@@ -1,9 +1,8 @@
-import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/cubit/cubit.dart';
-import 'package:illa_logs_app/layout/cubit/states.dart';
+import 'package:illa_logs_app/layout/user_cubit/user_cubit.dart';
+import 'package:illa_logs_app/layout/user_cubit/user_states.dart';
 import 'package:illa_logs_app/modules/logs_layout/screens/logs_viewer.dart';
 import 'package:illa_logs_app/modules/logs_layout/screens/webView.dart';
 
@@ -17,6 +16,7 @@ class LogsLayout extends StatefulWidget {
 }
 
 class _LogsLayoutState extends State<LogsLayout> {
+  bool isWebShowen = false;
 
 
 
@@ -51,9 +51,17 @@ class _LogsLayoutState extends State<LogsLayout> {
                     ),
                   ),
                   ///geoJson area
-                  if (cubit.isWebShowen)  const MyWebView() else InkWell(
+                  if (isWebShowen)  MyWebView(
+                      webShowCallback: () {
+                        setState(() {
+                          isWebShowen = false;
+                        });
+                      },
+                    ) else InkWell(
                     onTap: (){
-                      cubit.toggleWebView();
+                      setState(() {
+                        isWebShowen = true;
+                      });
                     },
                     child: Container(
                       width: 20,

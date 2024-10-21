@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/cubit/cubit.dart';
-import 'package:illa_logs_app/layout/cubit/states.dart';
+import 'package:illa_logs_app/layout/user_cubit/user_cubit.dart';
+import 'package:illa_logs_app/layout/user_cubit/user_states.dart';
+import '../../layout/search_cubit/search_cubit.dart';
 import '../../shared/components/components.dart';
 
 class UserTripsScreen extends StatelessWidget {
@@ -76,16 +77,19 @@ class UserTripsScreen extends StatelessWidget {
                                       }
                                       return id;
                                     }
-                                  cubit.userTripController.text = idExtractor(cubit.allUserTripsIDs[index]);
+                                  //cubit.userTripController.text = idExtractor(cubit.allUserTripsIDs[index]);
+                                  cubit.userTripController.text = idExtractor(SearchCubit.get(context).allUserTripsIDs[index]);
                                   cubit.getUserTripLogs(index);
                                   cubit.toggleLogView();
                                 },
                                 child: DefaultUserTripsViewer(
-                                  logID: cubit.allUserTripsIDs[index],
+                                  //logID: cubit.allUserTripsIDs[index],
+                                  logID: SearchCubit.get(context).allUserTripsIDs[index],
                                 ),
                               ),
                               separatorBuilder: (context, index) => const SizedBox(height: 5,),
-                              itemCount: cubit.allUserTripsIDs.length,
+                              //itemCount: cubit.allUserTripsIDs.length,
+                              itemCount: SearchCubit.get(context).allUserTripsIDs.length,
                             );
                           } else{
                             return const Center(child: Text('No Trips Available',

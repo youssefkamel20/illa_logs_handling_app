@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:illa_logs_app/layout/cubit/cubit.dart';
-import 'package:illa_logs_app/layout/cubit/states.dart';
+import 'package:illa_logs_app/layout/user_cubit/user_cubit.dart';
+import 'package:illa_logs_app/layout/user_cubit/user_states.dart';
 import 'package:illa_logs_app/modules/logs_layout/screens/webView.dart';
 import 'package:illa_logs_app/modules/logs_layout/utilities/dropdown_menus.dart';
 import 'package:illa_logs_app/shared/components/components.dart';
@@ -231,6 +231,8 @@ class _LogsScreenState extends State<LogsScreen> {
                    const SizedBox(width: 12,),
                    Expanded(
                       child: Text('Message',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontWeight: FontWeight.w500,

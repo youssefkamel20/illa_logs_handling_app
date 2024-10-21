@@ -13,13 +13,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   doWhenWindowReady((){
-    //appWindow.size = const Size(720.0, 480.0);
     appWindow.minSize = const Size(720.0, 480.0);
     appWindow.alignment = Alignment.center;
   });
-  // await windowManager.ensureInitialized();
-  // WindowManager.instance.setMinimumSize(const Size(720, 480));
-  // WindowManager.instance.hasShadow();
   Bloc.observer = MyBlocObserver();
   runApp(const MyApp());
 }
@@ -31,10 +27,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Illa logs Handling',
-      home: UserLayout(),
-    );
+        debugShowCheckedModeBanner: false,
+        title: 'Illa logs Handling',
+        home: UserLayout(),
+      );
   }
 }
 

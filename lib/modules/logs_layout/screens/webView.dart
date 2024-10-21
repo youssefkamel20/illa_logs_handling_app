@@ -1,14 +1,16 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
-import 'package:illa_logs_app/layout/cubit/cubit.dart';
 import 'package:webview_windows/webview_windows.dart';
-import '../logs_layout.dart';
 
 double logsWidth = 0;
 double webWidth = 0;
 class MyWebView extends StatefulWidget {
+  final VoidCallback webShowCallback;
 
-  const MyWebView({super.key});
+  const MyWebView({
+    required this.webShowCallback,
+    super.key,
+  });
 
   @override
   State<MyWebView> createState() => _MyWebViewState();
@@ -18,11 +20,17 @@ class _MyWebViewState extends State<MyWebView> {
   final WebviewController _controller = WebviewController();
   bool _isInitialized = false;
 
+
   @override
   void initState() {
     super.initState();
     _initializeController();
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<void> _initializeController() async {
     try {
       await _controller.initialize(); // Await asynchronous call
@@ -39,7 +47,6 @@ class _MyWebViewState extends State<MyWebView> {
 
   @override
   Widget build(BuildContext context) {
-    double screenSize = MediaQuery.of(context).size.width;
     if (logsWidth == 0 && webWidth == 0) {
       // Initialize widths only once based on screen width
       logsWidth = appWindow.size.width /2 -19;
@@ -129,10 +136,7 @@ class _MyWebViewState extends State<MyWebView> {
                   color: Colors.white,
                 ),
                 IconButton(
-                  onPressed: () {
-                    UserCubit.get(context).toggleWebView();
-                    _controller.dispose();
-                  },
+                  onPressed: widget.webShowCallback,
                   icon: const Icon(Icons.close),
                   color: Colors.white,
                 ),
