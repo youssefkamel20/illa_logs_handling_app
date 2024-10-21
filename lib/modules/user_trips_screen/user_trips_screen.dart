@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:illa_logs_app/layout/search_cubit/search_states.dart';
 import 'package:illa_logs_app/layout/user_cubit/user_cubit.dart';
-import 'package:illa_logs_app/layout/user_cubit/user_states.dart';
 import '../../layout/search_cubit/search_cubit.dart';
 import '../../shared/components/components.dart';
 
 class UserTripsScreen extends StatelessWidget {
+  const UserTripsScreen({super.key});
 
 
   @override
   Widget build(BuildContext context) {
 
-    return BlocConsumer<UserCubit, UserStates>(
+    return BlocConsumer<SearchCubit, SearchStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        final cubit = UserCubit.get(context);
+        final cubit = SearchCubit.get(context);
         return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
@@ -62,9 +63,9 @@ class UserTripsScreen extends StatelessWidget {
                             ),
                         );
                         }
-                      if (state is !UserSearchFailedState) {
-                        if(state is !UserSearchLoadingState){
-                          if(state is !UserSearchTripsNotFoundState){
+                      if (state is !SearchFailedState) {
+                        if(state is !SearchLoadingState){
+                          if(state is !SearchTripsNotFoundState){
                             return ListView.separated(
                               itemBuilder: (context, index) => MaterialButton(
                                 onPressed: () {
@@ -77,19 +78,16 @@ class UserTripsScreen extends StatelessWidget {
                                       }
                                       return id;
                                     }
-                                  //cubit.userTripController.text = idExtractor(cubit.allUserTripsIDs[index]);
-                                  cubit.userTripController.text = idExtractor(SearchCubit.get(context).allUserTripsIDs[index]);
-                                  cubit.getUserTripLogs(index);
-                                  cubit.toggleLogView();
+                                  cubit.userTripController.text = idExtractor(cubit.allUserTripsIDs[index]);
+                                  UserCubit.get(context).getUserTripLogs(index);
+                                  UserCubit.get(context).toggleLogView();
                                 },
                                 child: DefaultUserTripsViewer(
-                                  //logID: cubit.allUserTripsIDs[index],
-                                  logID: SearchCubit.get(context).allUserTripsIDs[index],
+                                  logID: cubit.allUserTripsIDs[index],
                                 ),
                               ),
                               separatorBuilder: (context, index) => const SizedBox(height: 5,),
-                              //itemCount: cubit.allUserTripsIDs.length,
-                              itemCount: SearchCubit.get(context).allUserTripsIDs.length,
+                              itemCount: cubit.allUserTripsIDs.length,
                             );
                           } else{
                             return const Center(child: Text('No Trips Available',

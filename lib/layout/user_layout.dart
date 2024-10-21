@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:illa_logs_app/layout/search_cubit/search_cubit.dart';
+import 'package:illa_logs_app/layout/search_cubit/search_states.dart';
 import 'package:illa_logs_app/layout/user_cubit/user_cubit.dart';
 import 'package:illa_logs_app/layout/user_cubit/user_states.dart';
 import 'package:illa_logs_app/modules/logs_layout/logs_layout.dart';
@@ -59,45 +60,47 @@ class _UserLayoutState extends State<UserLayout> {
                   ),
                 ),
                 ///row for search fields
-                title: Row(
-                  children: [
-                    DefaultFormField(
-                        titleText: 'User ID',
-                        controller: cubit.userIdController,
-                        onSubmit: (query){
-                          SearchCubit.get(context).searchForUserTrips(query);
-                          //cubit.searchForUserTrips(query);
-                          cubit.isLogsShowen = false;
-                          cubit.userTripController.clear();
-                        }
-                    ),
-                    const Spacer(),
-                    DefaultFormField(
-                        titleText: 'Trip ID',
-                        controller: cubit.userTripController,
-                        onSubmit: (query){
-                          cubit.statesErrorCount = 0;
-                          cubit.statesWarningCount = 0;
-                          cubit.statesInfoCount = 0;
-                          cubit.getSpecificTrip(query);
-                          cubit.toggleLogView();
-                          cubit.isLogsShowen = true;
-                        }
-                    ),
-                  ],
+                title: BlocBuilder<SearchCubit, SearchStates>(
+                  builder: (context, state) {
+                    var searchCubit = SearchCubit.get(context);
+                    return Row(
+                    children: [
+                      DefaultFormField(
+                          titleText: 'User ID',
+                          controller: searchCubit.userIdController,
+                          onSubmit: (query) {
+                            searchCubit.searchForUserTrips(query);
+                            cubit.isLogsShowen = false;
+                            cubit.userTripController.clear();
+                          }),
+                      const Spacer(),
+                      DefaultFormField(
+                          titleText: 'Trip ID',
+                          controller: cubit.userTripController,
+                          onSubmit: (query) {
+                            cubit.statesErrorCount = 0;
+                            cubit.statesWarningCount = 0;
+                            cubit.statesInfoCount = 0;
+                            cubit.getSpecificTrip(query);
+                            cubit.toggleLogView();
+                            cubit.isLogsShowen = true;
+                          }),
+                    ],
+                  );
+                  },
                 ),
               ),
-              body: Scaffold(
+              body: const Scaffold(
                 backgroundColor: Colors.white,
                 body: Stack(
                   children: [
                     ///Container for User trips
                     Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: EdgeInsets.all(15.0),
                       child: Column(
                         children: [
                           ///User-trips sentence and its container to view the data
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.symmetric(horizontal: 10.0),
                             child: Row(
                               children: [
