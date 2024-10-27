@@ -1,8 +1,8 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/user_cubit/user_cubit.dart';
-import 'package:illa_logs_app/layout/user_cubit/user_states.dart';
+import 'package:illa_logs_app/layout/user_cubit/logs_cubit.dart';
+import 'package:illa_logs_app/layout/user_cubit/logs_states.dart';
 import 'package:illa_logs_app/modules/logs_layout/screens/logs_viewer.dart';
 import 'package:illa_logs_app/modules/logs_layout/screens/webView.dart';
 
@@ -24,10 +24,10 @@ class _LogsLayoutState extends State<LogsLayout> {
   Widget build(BuildContext context) {
 
 
-    return BlocConsumer<UserCubit, UserStates>(
+    return BlocConsumer<LogsCubit, LogsState>(
       listener: (context, state) {},
       builder: (context, state) {
-        final cubit = UserCubit.get(context);
+        final cubit = LogsCubit.get(context);
         return ConditionalBuilder(
           condition: cubit.isLogsShowen,
           builder: (context) =>  Padding(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/search_cubit/search_states.dart';
-import 'package:illa_logs_app/layout/user_cubit/user_cubit.dart';
-import '../../layout/search_cubit/search_cubit.dart';
+import 'package:illa_logs_app/layout/search_cubit/users_search_states.dart';
+import 'package:illa_logs_app/layout/user_cubit/logs_cubit.dart';
+import '../../layout/search_cubit/users_search_cubit.dart';
 import '../../shared/components/components.dart';
 
 class UserTripsScreen extends StatelessWidget {
@@ -12,10 +12,10 @@ class UserTripsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return BlocConsumer<SearchCubit, SearchStates>(
+    return BlocConsumer<UsersSearchCubit, SearchStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        final cubit = SearchCubit.get(context);
+        final cubit = UsersSearchCubit.get(context);
         return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15.0),
@@ -63,9 +63,9 @@ class UserTripsScreen extends StatelessWidget {
                             ),
                         );
                         }
-                      if (state is !SearchFailedState) {
-                        if(state is !SearchLoadingState){
-                          if(state is !SearchTripsNotFoundState){
+                      if (state is !SearchUserFailedState) {
+                        if(state is !SearchUserLoadingState){
+                          if(state is !SearchUserNotFoundState){
                             return ListView.separated(
                               itemBuilder: (context, index) => MaterialButton(
                                 onPressed: () {
@@ -79,8 +79,8 @@ class UserTripsScreen extends StatelessWidget {
                                       return id;
                                     }
                                   cubit.userTripController.text = idExtractor(cubit.allUserTripsIDs[index]);
-                                  UserCubit.get(context).getUserTripLogs(index);
-                                  UserCubit.get(context).toggleLogView();
+                                  LogsCubit.get(context).getUserTripLogs(cubit.allUserTripsIDs[index]);
+                                  LogsCubit.get(context).toggleLogView();
                                 },
                                 child: DefaultUserTripsViewer(
                                   logID: cubit.allUserTripsIDs[index],

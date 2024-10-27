@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/search_cubit/search_cubit.dart';
-import 'package:illa_logs_app/layout/search_cubit/search_states.dart';
-import 'package:illa_logs_app/layout/user_cubit/user_cubit.dart';
-import 'package:illa_logs_app/layout/user_cubit/user_states.dart';
+import 'package:illa_logs_app/layout/search_cubit/users_search_cubit.dart';
+import 'package:illa_logs_app/layout/search_cubit/users_search_states.dart';
+import 'package:illa_logs_app/layout/user_cubit/logs_cubit.dart';
+import 'package:illa_logs_app/layout/user_cubit/logs_states.dart';
 import 'package:illa_logs_app/modules/logs_layout/logs_layout.dart';
 import 'package:illa_logs_app/modules/user_trips_screen/user_trips_screen.dart';
 import 'package:illa_logs_app/shared/components/components.dart';
@@ -17,18 +17,19 @@ class UserLayout extends StatefulWidget {
 }
 
 class _UserLayoutState extends State<UserLayout> {
+  TextEditingController userIdController = TextEditingController();
 
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) => UserCubit()..filterData()..searchInLogs(),
+      create: (BuildContext context) => LogsCubit()..filterData(),
       child: BlocProvider(
-        create: (context) => SearchCubit(),
-        child: BlocConsumer<UserCubit, UserStates>(
+        create: (context) => UsersSearchCubit(),
+        child: BlocConsumer<LogsCubit, LogsState>(
           listener: (context, state) {},
           builder: (context, state) {
-            var cubit = UserCubit.get(context);
+            final logsCubit = LogsCubit.get(context);
 
             return Scaffold(
               backgroundColor: Colors.white,
@@ -40,50 +41,48 @@ class _UserLayoutState extends State<UserLayout> {
                 ///back button or illa logo toggle
                 leading: Padding(
                   padding: const EdgeInsets.only(left: 10.0, top: 13),
-                  child: cubit.isLogsShowen
+                  child: logsCubit.isLogsShowen
                       ? IconButton(
-                    onPressed: () {
-                      cubit.toggleLogView();
-                      cubit.selectedOptions.clear();
-                      cubit.filteredLogs = cubit.logs;
-                      cubit.isSearchPressed = false;
-                      cubit.logSearchController.clear();
-                    },
-                    icon: const Icon(
-                      Icons.arrow_back_ios_rounded,
-                      size: 18,
-                    ),
-                  )
+                          onPressed: () {
+                            logsCubit.toggleLogView();
+                            logsCubit.selectedOptions.clear();
+                            logsCubit.filteredLogs = logsCubit.logs;
+                            logsCubit.isSearchPressed = false;
+                            logsCubit.logSearchController.clear();
+                          },
+                          icon: const Icon(
+                            Icons.arrow_back_ios_rounded,
+                            size: 18,
+                          ),
+                        )
                       : Image.asset(
                     'images/illaiconpic_png.png',
                     alignment: Alignment.center,
                   ),
                 ),
                 ///row for search fields
-                title: BlocBuilder<SearchCubit, SearchStates>(
+                title: BlocBuilder<UsersSearchCubit, SearchStates>(
                   builder: (context, state) {
-                    var searchCubit = SearchCubit.get(context);
+                    var usersSearchCubit = UsersSearchCubit.get(context);
                     return Row(
                     children: [
-                      DefaultFormField(
+                        DefaultFormField(
                           titleText: 'User ID',
-                          controller: searchCubit.userIdController,
+                          controller: userIdController,
                           onSubmit: (query) {
-                            searchCubit.searchForUserTrips(query);
-                            cubit.isLogsShowen = false;
-                            cubit.userTripController.clear();
-                          }),
-                      const Spacer(),
+                            logsCubit.userIdController = userIdController;
+                            usersSearchCubit.userIdController = userIdController;
+                            usersSearchCubit.searchForUserTrips(query);
+                            logsCubit.isLogsShowen = false;
+                            logsCubit.userTripController.clear();
+                          },
+                        ),
+                        const Spacer(),
                       DefaultFormField(
                           titleText: 'Trip ID',
-                          controller: cubit.userTripController,
+                          controller: logsCubit.userTripController,
                           onSubmit: (query) {
-                            cubit.statesErrorCount = 0;
-                            cubit.statesWarningCount = 0;
-                            cubit.statesInfoCount = 0;
-                            cubit.getSpecificTrip(query);
-                            cubit.toggleLogView();
-                            cubit.isLogsShowen = true;
+                            logsCubit.getTripLogs(query);
                           }),
                     ],
                   );
@@ -122,7 +121,7 @@ class _UserLayoutState extends State<UserLayout> {
                         ],
                       ),
                     ),
-                    const LogsLayout(),
+                    LogsLayout(),
                   ],
                 ),
               ),

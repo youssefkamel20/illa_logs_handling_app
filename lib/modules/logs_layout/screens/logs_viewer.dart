@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:illa_logs_app/layout/user_cubit/user_cubit.dart';
-import 'package:illa_logs_app/layout/user_cubit/user_states.dart';
+import 'package:illa_logs_app/layout/user_cubit/logs_cubit.dart';
+import 'package:illa_logs_app/layout/user_cubit/logs_states.dart';
 import 'package:illa_logs_app/modules/logs_layout/screens/webView.dart';
 import 'package:illa_logs_app/modules/logs_layout/utilities/dropdown_menus.dart';
 import 'package:illa_logs_app/shared/components/components.dart';
@@ -28,10 +28,10 @@ class _LogsScreenState extends State<LogsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<UserCubit, UserStates>(
+    return BlocConsumer<LogsCubit, LogsState>(
       listener: (context, state) {},
       builder: (context, state) {
-        var cubit = UserCubit.get(context);
+        var cubit = LogsCubit.get(context);
 
         return Container(
           width: logsWidth,
@@ -246,10 +246,34 @@ class _LogsScreenState extends State<LogsScreen> {
              ///Logs ListView
              Expanded(
                child: ((){
-                 if(state is TripSearchLoadingState){
+                 if(state is LogsLoadingState){
                    return const Center(child: CircularProgressIndicator());
                  }
-                 if (state is TripSearchFailedState) {
+                 else if(state is LogsSuccessState){
+                   return ListView.separated(
+                     shrinkWrap: true,
+                     itemBuilder: (context, index) {
+                       if (cubit.isSearchPressed) {
+                         return DefaultLogsViewer(
+                           logState: state.logs[index]['state'] as String,
+                           logDate:state.logs[index]['date'] as String,
+                           logData:state.logs[index]['log'] as String,
+                         );
+                       } else {
+                         return DefaultLogsViewer(
+                           logState: state.logs[index]['state'] as String,
+                           logDate: state.logs[index]['date'] as String,
+                           logData: state.logs[index]['log'] as String,
+                         );
+                       }
+                     },
+                     separatorBuilder: (context, index) => const Divider(),
+                     itemCount: cubit.isSearchPressed
+                         ? cubit.searchedLogs.length
+                         : cubit.filteredLogs.length,
+                   );
+                 }
+                 else if (state is LogsFailedState) {
                    return const Center(
                        child: Text(
                          'Trip Not Found !!',
