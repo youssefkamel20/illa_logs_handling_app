@@ -1,14 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/search_cubit/users_search_states.dart';
+import 'package:illa_logs_app/layout/userSearch_layout/search_cubit/users_search_states.dart';
 
 class UsersSearchCubit extends Cubit<SearchStates>{
   UsersSearchCubit() : super(SearchInitialState());
   static UsersSearchCubit get(context) => BlocProvider.of(context);
 
-  var userIdController = TextEditingController();
-  var userTripController = TextEditingController();
   List<String> allUserTripsIDs = [];
 
 

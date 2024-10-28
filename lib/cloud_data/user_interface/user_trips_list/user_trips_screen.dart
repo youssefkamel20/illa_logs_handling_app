@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/search_cubit/users_search_states.dart';
-import 'package:illa_logs_app/layout/user_cubit/logs_cubit.dart';
-import '../../layout/search_cubit/users_search_cubit.dart';
+import 'package:illa_logs_app/layout/logsScreen_layout/logs_layout.dart';
+import 'package:illa_logs_app/layout/userSearch_layout/search_cubit/users_search_states.dart';
+import '../../layout/userSearch_layout/search_cubit/users_search_cubit.dart';
 import '../../shared/components/components.dart';
 
 class UserTripsScreen extends StatelessWidget {
-  const UserTripsScreen({super.key});
+  final TextEditingController userIdController;
+  const UserTripsScreen({super.key, required this.userIdController});
 
 
   @override
@@ -49,7 +50,7 @@ class UserTripsScreen extends StatelessWidget {
                   const SizedBox(height: 10,),
                   Expanded(
                     child: (() {
-                      if(cubit.userIdController.text.isEmpty){
+                      if(userIdController.text.isEmpty){
                         return SizedBox(
                           height: 250,
                           child: Center(
@@ -78,9 +79,11 @@ class UserTripsScreen extends StatelessWidget {
                                       }
                                       return id;
                                     }
-                                  cubit.userTripController.text = idExtractor(cubit.allUserTripsIDs[index]);
-                                  LogsCubit.get(context).getUserTripLogs(cubit.allUserTripsIDs[index]);
-                                  LogsCubit.get(context).toggleLogView();
+                                  Navigator.pushAndRemoveUntil(context,
+                                    MaterialPageRoute(builder: (context) =>
+                                        LogsLayout(tripId: idExtractor(cubit.allUserTripsIDs[index]), userID: userIdController.text,),
+                                    ),
+                                        (route) => true,);
                                 },
                                 child: DefaultUserTripsViewer(
                                   logID: cubit.allUserTripsIDs[index],

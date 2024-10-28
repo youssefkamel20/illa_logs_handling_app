@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
+import '../../../layout/logsScreen_layout/logs_cubit/logs_cubit.dart';
 
 class DropDownCheckBox extends StatelessWidget {
+  final List<String> options =[
+    'Error',
+    'Info',
+    'Warning'
+  ];
 
-  var cubit;
-  List<String> options;
-
-  DropDownCheckBox({super.key,
-    required this.options,
-    required this.cubit, //handle if you will separate widget from cubit
-  });
+  DropDownCheckBox({super.key});
 
   @override
   Widget build(BuildContext context) {
+    
+    final logsCubit = BlocProvider.of<LogsCubit>(context);
+    
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: Container(
@@ -35,17 +39,16 @@ class DropDownCheckBox extends StatelessWidget {
                 value: option,
                 child: StatefulBuilder(
                   builder: (context, setState) {
-                    bool isSelected = cubit.selectedOptions.contains(option); //show whether the option is previously selected or not
+                    bool isSelected = logsCubit.selectedLevelOptions.contains(option); //show whether the option is previously selected or not
                     return GestureDetector(
                       onTap: (){
                         setState(() {
                           if(isSelected){
-                            cubit.selectedOptions.remove(option.toString()); //if it was selected the only action is to remove it
+                            logsCubit.selectedLevelOptions.remove(option.toString()); //if it was selected the only action is to remove it
                           } else {
-                            cubit.selectedOptions.add(option.toString()); //it it is not on the list add it
+                            logsCubit.selectedLevelOptions.add(option.toString()); //it it is not on the list add it
                           }
-                          print(cubit.selectedOptions);
-                          cubit.filterData();
+                          logsCubit.filterLogsByLevel();
                         });
                       },
                       child: Row(
@@ -77,17 +80,17 @@ class DropDownCheckBox extends StatelessWidget {
                             ),
 
                           /// for option count
-                          if(option == 'Info') Text('${cubit.statesInfoCount}',
+                          if(option == 'Info') Text('${logsCubit.statesInfoCount}',
                             style: const TextStyle(
                               color: Colors.grey,
                             ),
                           )
-                          else if (option == 'Warning') Text('${cubit.statesWarningCount}',
+                          else if (option == 'Warning') Text('${logsCubit.statesWarningCount}',
                             style: const TextStyle(
                               color: Colors.grey,
                             ),
                           )
-                          else if (option == 'Error') Text('${cubit.statesErrorCount}',
+                          else if (option == 'Error') Text('${logsCubit.statesErrorCount}',
                               style: const TextStyle(
                                 color: Colors.grey,
                               ),
@@ -100,6 +103,54 @@ class DropDownCheckBox extends StatelessWidget {
               );
             }).toList(),
             onChanged: (value){},
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DropDownSort extends StatelessWidget {
+  final List<String> sortPreference =[
+    'level',
+    'date',
+  ];
+  DropDownSort({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final logsCubit = LogsCubit.get(context);
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Container(
+        width: 110,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey, width: 1),
+          borderRadius: BorderRadius.circular(6.0),
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            isExpanded: false,
+            menuWidth: 110,
+            alignment: Alignment.center,
+            hint: const Text('Sort by'),
+            icon: const Icon(Icons.keyboard_arrow_down),
+            items: sortPreference.map((String item) {
+              return DropdownMenuItem(
+                value: item,
+                child: Text(item),
+              );
+            }).toList(),
+            onChanged: (value) {
+              logsCubit.sortLogs(preference: value);
+            },
+            style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 16,
+                fontWeight: FontWeight.w500
+            ),
+            borderRadius: BorderRadius.circular(10.0),
           ),
         ),
       ),

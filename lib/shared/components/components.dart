@@ -46,6 +46,44 @@ class DefaultFormField extends StatelessWidget {
   }
 }
 
+class DefaultIDViewer extends StatelessWidget {
+  final String titleText;
+  final String id;
+  const DefaultIDViewer({super.key, required this.titleText, required this.id});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 15.0),
+          child: Text(titleText, style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),),
+        ),
+        const SizedBox(height: 5,),
+        Container(
+          width: 300,
+          height: 35,
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+            border: Border.all(width: 1.0, color: Colors.grey),
+          ),
+          child: SelectableText(id,
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class DefaultLogsViewer extends StatelessWidget {
   final String logState;
   final String logDate;
