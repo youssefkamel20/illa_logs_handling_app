@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/logsScreen_layout/logs_cubit/logs_states.dart';
+import 'package:illa_logs_app/cloud_data/logs_list_screen/logs_cubit/logs_states.dart';
 
 class LogsCubit extends Cubit<LogsState> {
   LogsCubit() : super(LogsLoadingState());
@@ -233,34 +233,30 @@ class LogsCubit extends Cubit<LogsState> {
       }
     });
   }
-
   void stopUpdateDatabase() {
     isUpdateStopped = true;
     _streamSubscription?.cancel();
     updateDatabase();
   }
-
   void resumeUpdateDatabase() {
     isUpdateStopped = false;
     updateDatabase();
   }
 
   ///Sort Logs
-  sortLogs({var preference = 'date'}) {
-    filteredLogs.clear();
-    filteredLogs.addAll(logs);
-    if (preference == 'level') {
-      filteredLogs.sort((a, b) => a['state']!.compareTo(b['state']!));
-      emit(LogsSortUpdateState('', filteredLogs));
-    } else if (preference == 'date') {
+  sortLogs({var preference = ''}) {
+    filteredLogs = logs;
+    if (preference == 'asc') {
       filteredLogs.sort((a, b) => a['date']!.compareTo(b['date']!));
+      emit(LogsSortUpdateState('', filteredLogs));
+    } else if (preference == 'dsc') {
+      filteredLogs.sort((b, a) => a['date']!.compareTo(b['date']!));
       emit(LogsSortUpdateState('', filteredLogs));
     }
   }
 
   ///Filter Logs
   List<String> selectedLevelOptions = [];
-
   filterLogsByLevel() {
     emit(LogsLoadingState());
     try {
@@ -278,8 +274,7 @@ class LogsCubit extends Cubit<LogsState> {
 
       if (selectedLevelOptions.length == oneLevelSelected) {
         if (selectedLevelOptions.contains('Error')) {
-          filteredLogs =
-              logs.where((log) => log['state']!.contains('E')).toList();
+          filteredLogs = logs.where((log) => log['state']!.contains('E')).toList();
         } else if (selectedLevelOptions.contains('Warning')) {
           filteredLogs =
               logs.where((log) => log['state']!.contains('W')).toList();
@@ -288,12 +283,8 @@ class LogsCubit extends Cubit<LogsState> {
               logs.where((log) => log['state']!.contains('I')).toList();
         }
       } else if (selectedLevelOptions.length == twoLevelsSelected) {
-        if (selectedLevelOptions.contains('Error') &&
-            selectedLevelOptions.contains('Warning')) {
-          filteredLogs = logs
-              .where((log) =>
-                  log['state']!.contains('E') || log['state']!.contains('W'))
-              .toList();
+        if (selectedLevelOptions.contains('Error') && selectedLevelOptions.contains('Warning')) {
+          filteredLogs = logs.where((log) => log['state']!.contains('E') || log['state']!.contains('W')).toList();
         } else if (selectedLevelOptions.contains('Error') &&
             selectedLevelOptions.contains('Info')) {
           filteredLogs = logs

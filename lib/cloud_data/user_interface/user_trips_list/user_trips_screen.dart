@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/logsScreen_layout/logs_layout.dart';
-import 'package:illa_logs_app/layout/userSearch_layout/search_cubit/users_search_states.dart';
-import '../../layout/userSearch_layout/search_cubit/users_search_cubit.dart';
-import '../../shared/components/components.dart';
+
+import '../../../shared/components/components.dart';
+import '../../logs_list_screen/logs_screen_interface.dart';
+import '../user_search_cubit/users_search_cubit.dart';
+import '../user_search_cubit/users_search_states.dart';
 
 class UserTripsScreen extends StatelessWidget {
   final TextEditingController userIdController;

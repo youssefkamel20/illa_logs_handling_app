@@ -2,8 +2,6 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_windows/webview_windows.dart';
 
-double logsWidth = 0;
-double webWidth = 0;
 class MyWebView extends StatefulWidget {
   final VoidCallback webShowCallback;
 
@@ -18,6 +16,8 @@ class MyWebView extends StatefulWidget {
 
 class _MyWebViewState extends State<MyWebView> {
   final WebviewController _controller = WebviewController();
+  double logsWidth = 0;
+  double webWidth = 0;
   bool _isInitialized = false;
 
 

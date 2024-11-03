@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/userSearch_layout/search_cubit/users_search_states.dart';
+
+import 'users_search_states.dart';
 
 class UsersSearchCubit extends Cubit<SearchStates>{
   UsersSearchCubit() : super(SearchInitialState());

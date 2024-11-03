@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/logsScreen_layout/logs_layout.dart';
-import 'package:illa_logs_app/layout/userSearch_layout/search_cubit/users_search_cubit.dart';
-import 'package:illa_logs_app/layout/userSearch_layout/search_cubit/users_search_states.dart';
-import 'package:illa_logs_app/modules/user_trips_screen/user_trips_screen.dart';
 import 'package:illa_logs_app/shared/components/components.dart';
+import '../logs_list_screen/logs_screen_interface.dart';
+import 'user_search_cubit/users_search_cubit.dart';
+import 'user_search_cubit/users_search_states.dart';
+import 'user_trips_list/user_trips_screen.dart';
 
 class UserLayout extends StatefulWidget {
   const UserLayout({super.key});
@@ -75,11 +75,11 @@ class _UserLayoutState extends State<UserLayout> {
             ),
             ///User-Trips
             body: Padding(
-              padding: EdgeInsets.all(15.0),
+              padding: const EdgeInsets.all(15.0),
               child: Column(
                 children: [
                   ///User-trips sentence and its container to view the data
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: Row(
                       children: [

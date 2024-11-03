@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:illa_logs_app/layout/logsScreen_layout/logs_cubit/logs_cubit.dart';
-import 'package:illa_logs_app/layout/logsScreen_layout/logs_cubit/logs_states.dart';
-import 'package:illa_logs_app/modules/logs_panel/logs_panel.dart';
-
 import '../../shared/components/components.dart';
+import 'logs_cubit/logs_cubit.dart';
+import 'logs_cubit/logs_states.dart';
+import 'logs_map_panel/logs_panel.dart';
 
 class LogsLayout extends StatelessWidget {
    final String tripId;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:illa_logs_app/modules/logs_panel/screens/logs_viewer.dart';
-import 'package:illa_logs_app/modules/logs_panel/screens/webView.dart';
+
+import 'geoJson_webview/webView.dart';
+import 'logs_listviewer/logs_viewer.dart';
 
 ///container for geoJson and logs presenting
 class LogsPanel extends StatefulWidget {

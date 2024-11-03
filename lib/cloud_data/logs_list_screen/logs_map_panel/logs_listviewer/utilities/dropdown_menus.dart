@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
-import '../../../layout/logsScreen_layout/logs_cubit/logs_cubit.dart';
+
+import '../../../logs_cubit/logs_cubit.dart';
 
 class DropDownCheckBox extends StatelessWidget {
   final List<String> options =[
@@ -112,8 +113,8 @@ class DropDownCheckBox extends StatelessWidget {
 
 class DropDownSort extends StatelessWidget {
   final List<String> sortPreference =[
-    'level',
-    'date',
+    'asc',
+    'dsc',
   ];
   DropDownSort({super.key});
 
@@ -134,7 +135,7 @@ class DropDownSort extends StatelessWidget {
             isExpanded: false,
             menuWidth: 110,
             alignment: Alignment.center,
-            hint: const Text('Sort by'),
+            hint: const Text('Sort Date'),
             icon: const Icon(Icons.keyboard_arrow_down),
             items: sortPreference.map((String item) {
               return DropdownMenuItem(

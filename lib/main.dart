@@ -3,8 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:illa_logs_app/firebase_options.dart';
-import 'package:illa_logs_app/layout/userSearch_layout/user_layout.dart';
 import 'package:illa_logs_app/shared/bloc_observer.dart';
+
+import 'cloud_data/user_interface/user_layout.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

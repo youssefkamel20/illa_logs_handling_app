@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../layout/logsScreen_layout/logs_cubit/logs_cubit.dart';
+
+import '../../../logs_cubit/logs_cubit.dart';
 class SearchInLogs extends StatefulWidget {
   const SearchInLogs({super.key});
 
@@ -39,9 +40,7 @@ class _SearchInLogsState extends State<SearchInLogs> {
               suffix: IconButton(
                 onPressed: () {
                   setState(() {
-                    //fixme:: ensure dispose of the search in logs
                     logsCubit.clearSearch(terminate: true);
-                    logsCubit.searchInLogs('');
                     logsDataSearch.clear();
                   });
                 },

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:illa_logs_app/layout/logsScreen_layout/logs_cubit/logs_cubit.dart';
-import 'package:illa_logs_app/layout/logsScreen_layout/logs_cubit/logs_states.dart';
-import 'package:illa_logs_app/modules/logs_panel/screens/webView.dart';
-import 'package:illa_logs_app/modules/logs_panel/utilities/dropdown_menus.dart';
 import 'package:illa_logs_app/shared/components/components.dart';
-
-import '../utilities/search_field.dart';
+import '../../logs_cubit/logs_cubit.dart';
+import '../../logs_cubit/logs_states.dart';
+import '../geoJson_webview/webView.dart';
+import 'utilities/dropdown_menus.dart';
+import 'utilities/search_field.dart';
 
 class LogsDataViewer extends StatefulWidget {
   const LogsDataViewer({super.key});
@@ -18,9 +17,6 @@ class LogsDataViewer extends StatefulWidget {
 
 class _LogsDataViewerState extends State<LogsDataViewer> {
 
-  final TextEditingController _logsDataSearch = TextEditingController();
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +26,6 @@ class _LogsDataViewerState extends State<LogsDataViewer> {
         var logsCubit = LogsCubit.get(context);
 
         return Container(
-          width: logsWidth,
           clipBehavior: Clip.antiAlias,
           decoration: const BoxDecoration(
             color: Colors.white,
